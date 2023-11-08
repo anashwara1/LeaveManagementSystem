@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'LMS',
         'USER': 'root',
         'PASSWORD':'sqlhustle@79986',
-        'HOST': '192.168.68.126',  # Replace with your friend's laptop IP or hostname
+        'HOST': 'localhost',  # Replace with your friend's laptop IP or hostname
         'PORT': '3306',
     }
 }

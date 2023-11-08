@@ -17,5 +17,12 @@
             <button>Sign In</button><br>
         </div>
     </form>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li> {{ message|escape }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </body>
 </html>

@@ -1,21 +1,76 @@
-{% load static %}
-<html>
-<head>
-    <link href="{% static 'css/login.css' %}" rel="stylesheet">
-</head>
-<body>
-    <div class="lms">
-        <h1>LEAVE MANAGEMENT SYSTEM</h1>
-    </div>
-    <form action="{% url 'login' %}" method="POST">
-        {% csrf_token %}
-        <div class="box">
-            <h2>Login</h2>
-            <input class="user" type="text" name="username" placeholder="Username/Email ID"><br>
-            <input class="pass" type="password" name="password" placeholder="Password" required><br>
-            <a href="#">Forgot password?</a><br>
-            <button>Sign In</button><br>
-        </div>
-    </form>
-</body>
-</html>
+.lms {
+    text-align: center;
+}
+h2{
+  color: rgb(9, 118, 172);
+  text-align:center;
+}
+body {
+    color:rgb(9, 118, 172);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color:whitesmoke;
+}
+
+form {
+    text-align: center;
+}
+
+.box {
+
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);;
+    text-align: left;
+    border-radius: 10px;
+    border: 1px solid #333;
+    padding: 20px;
+    background-color: whitesmoke;
+    margin: 10px;
+    width: 400px;
+}
+input{
+
+
+  border-radius: 10px;
+  padding: 10px;
+}
+
+input.user{
+
+  font-size: medium;
+  padding: 20px;
+  width: 350px;
+}
+
+input.pass {
+
+    font-size: medium;
+    padding: 20px;
+    width: 350px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+a{
+
+    padding: 5px;
+}
+
+button {
+
+    color: whitesmoke;
+    background-color:rgb(9, 118, 172);
+    height: 50px;
+    width: 400px;
+    font-size: medium;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+.th{
+    margin-left: 80px;
+    margin-top: 10px;
+}
