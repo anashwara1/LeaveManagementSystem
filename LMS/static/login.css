@@ -1,0 +1,21 @@
+{% load static %}
+<html>
+<head>
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="lms">
+        <h1>LEAVE MANAGEMENT SYSTEM</h1>
+    </div>
+    <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <div class="box">
+            <h2>Login</h2>
+            <input class="user" type="text" name="username" placeholder="Username/Email ID"><br>
+            <input class="pass" type="password" name="password" placeholder="Password" required><br>
+            <a href="#">Forgot password?</a><br>
+            <button>Sign In</button><br>
+        </div>
+    </form>
+</body>
+</html>
