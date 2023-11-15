@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os.path
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp'
+    'myapp',
 ]
 
 MIDDLEWARE = [
@@ -77,11 +78,11 @@ WSGI_APPLICATION = 'LMS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'LMS',
-        'USER': 'root',
-        'PASSWORD': 'kanmani@3112',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': config('db_name'),
+        'USER': config('db_username'),
+        'PASSWORD': config('db_password'),
+        'HOST': config('db_host'),
+        'PORT': config('db_port'),
     }
 }
 

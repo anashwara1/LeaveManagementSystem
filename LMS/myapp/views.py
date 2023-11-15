@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.contrib.auth.models import User
 # Create your views here.
 #def home(request):
@@ -8,7 +9,7 @@ from django.contrib.auth.models import User
 def dashboard(request):
     return render(request, 'dashboard.html')
 
-def login_view(request):
+def logins(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -17,6 +18,18 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard')
         # Handle invalid login here
+        else:
+            messages.error(request, "Invalid Credentials. Please check your username and password.")
 
     return render(request, 'login.html')
+
+def forgotpass(request):
+    return render(request, 'forgotpassword.html')
+
+def applyleave(request):
+    return render(request, 'applyleave.html')
+
+def leavehistory(request):
+    return render(request, 'leavehistory.html')
+
 
