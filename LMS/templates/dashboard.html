@@ -13,13 +13,13 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0976ac;">
     <div class="container">
-      <a class="navbar-brand" href="#">DASHBOARD</a>
+      <a class="navbar-brand" href="#">PROFILE</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+          <a class="nav-link active" aria-current="page" href="#">Profile</a>
           <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
           <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
         </div>
@@ -84,6 +84,13 @@
                 <label for="employee-manager" class="col-md-3 col-form-label">Manager:</label>
                 <div class="col-md-9">
                     <input type="text" class="form-control" id="employee-manager" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="leave-balance" class="col-md-3 col-form-label">Leave Balance:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-balance" disabled>
                 </div>
             </div>
         </form>
