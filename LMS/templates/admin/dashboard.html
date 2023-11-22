@@ -1,0 +1,104 @@
+{% load static %}
+<!--<!DOCTYPE html>-->
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/admin/dashboard.css' %}" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark" id="custom-navbar">
+    <div class="container">
+      <a class="navbar-brand">LEAVE MANAGEMENT</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+          <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
+          <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
+          <a class="nav-link" href="#">Employees</a>
+          <a class="nav-link" href="#">Leave Requests</a>
+          <a class="nav-link" href="#">Add Employees</a>
+        </div>
+      </div>
+    </div>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+      <a class="nav-link" href="{% url 'login' %}">Logout</a>
+    </div>
+  </nav>
+
+  <br><br>
+
+  <div class="container main-content">
+
+    <div class="row">
+
+      <div class="col-sm-4">
+        <div class="card custom-card">
+          <div class="card-body" >
+            <h5 class="card-title">Registered Employees:</h5>
+            <p class="card-text">3</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="card custom-card" >
+          <div class="card-body">
+            <h5 class="card-title">Leave Requests:</h5>
+            <p class="card-text">3</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br><br><br>
+
+  <table class="table table-striped custom-table">
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>Leave Type</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Emp_1</td>
+        <td>Sick Leave</td>
+        <td>2023-11-16</td>
+        <td>2023-11-18</td>
+        <td>Approved</td>
+      </tr>
+      <tr>
+        <td>Emp_2</td>
+        <td>Paid Leave</td>
+        <td>2023-11-20</td>
+        <td>2023-11-22</td>
+        <td>Pending</td>
+      </tr>
+      <tr>
+        <td>Emp_3</td>
+        <td>Sick Leave</td>
+        <td>2023-10-05</td>
+        <td>2023-10-06</td>
+        <td>Rejected</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
+
