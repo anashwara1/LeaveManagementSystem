@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Details</title>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+  <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand">LEAVE MANAGEMENT</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="#">Dashboard</a>
+          <a class="nav-link" href="#">Apply Leave</a>
+          <a class="nav-link" href="#"> Leave History</a>
+          <a class="nav-link" href="{% url 'employee' %}"> Employees</a>
+          <a class="nav-link" href="#">Leave Requests</a>
+          <a class="nav-link active" aria-current="page" href="#">Add Employees</a>
+        </div>
+      </div>
+    </div>
+  <div class="navbar-nav ml-auto">
+      <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+       <a class="nav-link" href="{% url 'login' %}">Logout</a>
+    </div>
+  </nav>
+<br>
+<div class="container">
+ <div class="card-header text-center">
+    Register User
+  </div>
+<br>
+
+<form>
+            <div class="form-group row">
+                <label for="employee-id" class="col-md-3 col-form-label bold-label">Emp ID:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-id" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-name" class="col-md-3 col-form-label bold-label">Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-name" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-designation" class="col-md-3 col-form-label bold-label">Designation:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-designation" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-department" class="col-md-3 col-form-label bold-label">Department:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-department" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-doj" class="col-md-3 col-form-label bold-label">Date of Joining:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-doj" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-manager" class="col-md-3 col-form-label bold-label">Manager:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-manager" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="leave-balance" class="col-md-3 col-form-label bold-label">Leave Balance:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-balance" required>
+                </div>
+            </div>
+    <br>
+            <button>Submit</button>
+        </form>
+
+</div>
+</body>
+</html>
