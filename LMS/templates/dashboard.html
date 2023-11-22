@@ -11,91 +11,95 @@
 </head>
 <body>
 
+
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0976ac;">
     <div class="container">
-      <a class="navbar-brand" href="#">PROFILE</a>
+      <a class="navbar-brand">LEAVE MANAGEMENT</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link active" aria-current="page" href="#">Profile</a>
+          <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
           <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
           <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
         </div>
       </div>
     </div>
       <div class="navbar-nav ml-auto">
+          <a class="nav-link" href="{% url 'profile' %}">Profile</a>
        <a class="nav-link" href="{% url 'login' %}">Logout</a>
     </div>
   </nav>
+<br><br>
+<div class="container">
 
-   <div class="card">
-  <div class="card-header text-center">
-    Employee Profile
-  </div>
-       <br>
-  <div class="container-fluid h-100">
-    <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-md-4 text-center">
-            <img src="https://picsum.photos/400/200" alt="Employee Image" class="img-fluid rounded-circle" style="width: 150px; height: 150px; margin-bottom: 20px;">
-        </div>
+    <div class="row">
+
+
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body" style="height: 200px;">
+        <h5 class="card-title">TOTAL LEAVE BALANCE:</h5>
+        <p class="card-text">3</p>
+      </div>
     </div>
   </div>
-    <div class="card-body">
-    <div class="container">
-        <form>
-            <div class="form-group row">
-                <label for="employee-id" class="col-md-3 col-form-label">Emp ID:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-id" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-name" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-designation" class="col-md-3 col-form-label">Designation:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-designation" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-department" class="col-md-3 col-form-label">Department:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-department" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-doj" class="col-md-3 col-form-label">Date of Joining:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-doj" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-manager" class="col-md-3 col-form-label">Manager:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-manager" disabled>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="leave-balance" class="col-md-3 col-form-label">Leave Balance:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="leave-balance" disabled>
-                </div>
-            </div>
-        </form>
+      <div class="col-sm-4">
+    <div class="card" style="height: 200px;">
+      <div class="card-body">
+        <h5 class="card-title">SICK LEAVE:</h5>
+        <p class="card-text">3</p>
+
+      </div>
     </div>
+  </div>
+      <div class="col-sm-4">
+    <div class="card" style="height: 200px;">
+      <div class="card-body">
+        <h5 class="card-title">PAID LEAVE</h5>
+        <p class="card-text">0</p>
+
+      </div>
+    </div>
+  </div>
 </div>
+  </div>
+  <br><br><br>
+
+  <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Leave Type</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sick Leave</td>
+          <td>2023-11-16</td>
+          <td>2023-11-18</td>
+          <td>Approved</td>
+        </tr>
+        <tr>
+          <td>Paid Leave</td>
+          <td>2023-11-20</td>
+          <td>2023-11-22</td>
+          <td>Pending</td>
+        </tr>
+        <tr>
+          <td>Sick Leave</td>
+          <td>2023-10-05</td>
+          <td>2023-10-06</td>
+          <td>Rejected</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
 
 </body>
 </html>

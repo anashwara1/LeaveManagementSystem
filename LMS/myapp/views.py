@@ -2,14 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import LeaveRequest
+from .models import Employees
 
 # Create your views here.
 #def home(request):
  #   return render(request, 'login.html')
 
 def dashboard(request):
-
     return render(request, 'dashboard.html')
 
 def logins(request):
@@ -33,7 +32,9 @@ def applyleave(request):
     return render(request, 'applyleave.html')
 
 def leavehistory(request):
-
     return render(request, 'leavehistory.html')
+
+def profile(request):
+    return render(request, 'profile.html')
 
 
