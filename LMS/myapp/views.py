@@ -29,15 +29,16 @@ def forgotpass(request):
     return render(request, 'forgotpassword.html')
 
 def applyleave(request):
-    return render(request, 'employee/applyleave.html')
+    return render(request, 'applyleave.html')
 
 def leavehistory(request):
-    return render(request, 'employee/leavehistory.html')
+    return render(request, 'leavehistory.html')
 
 def profile(request):
-    return render(request, 'employee/profile.html')
+    return render(request, 'profile.html')
 
 def emppage(request):
     return render(request, 'emppage.html')
+
 
 
