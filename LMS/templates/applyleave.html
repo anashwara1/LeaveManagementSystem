@@ -10,24 +10,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0976ac;">
     <div class="container">
-      <a class="navbar-brand" href="#">APPLY LEAVE</a>
+      <a class="navbar-brand">LEAVE MANAGEMENT</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link" href="{% url 'dashboard' %}">Profile</a>
+          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
           <a class="nav-link active" aria-current="page" href="#">Apply Leave</a>
           <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
+
         </div>
       </div>
     </div>
     <div class="navbar-nav ml-auto">
+        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
        <a class="nav-link" href="{% url 'login' %}">Logout</a>
     </div>
   </nav>
+  </div>
 <div class="card">
   <div class="card-header text-center">
     Apply Leave
@@ -37,38 +41,42 @@
     <form action="#">
       <div class="row">
         <div class="col-md-12">
-          <div class="form-group">
-            <label for="leave_type">Leave Type</label>
-            <div class="col-md-3">
+    <div class="form-group row">
+        <label for="leave_type" class="col-md-3 col-form-label">Leave Type:</label>
+        <div class="col-md-3">
             <select class="form-select" id="leave_type">
-              <option value="Sick Leave">Sick Leave</option>
-              <option value="Paid Leave">Paid Leave</option>
-              <option value="Other">Other</option>
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Paid Leave">Paid Leave</option>
+                <option value="Other">Other</option>
             </select>
-          </div>
-          </div>
+          <br>
         </div>
+    </div>
+</div>
+
         <div class="col-md-12">
-          <div class="form-group">
-            <label for="start_date">Start Date</label>
+          <div class="form-group row">
+            <label for="start_date" class="col-md-3 col-form-label">Start Date:</label>
             <div class="col-md-3">
             <input type="date" class="form-control" id="start_date" placeholder="Start Date">
             </div>
           </div>
+          <br>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="form-group">
-            <label for="end_date">End Date</label>
+          <div class="form-group row">
+            <label for="end_date" class="col-md-3 col-form-label">End Date:</label>
             <div class="col-md-3">
             <input type="date" class="form-control" id="end_date" placeholder="End Date">
             </div>
           </div>
+          <br>
         </div>
         <div class="col-md-12">
-          <div class="form-group">
-            <label for="reason">Reason</label>
+          <div class="form-group row">
+            <label for="reason" class="col-md-3 col-form-label">Reason:</label>
             <div class="col-md-3">
             <textarea class="form-control" id="reason" rows="3" placeholder="Reason for leave"></textarea>
             </div>

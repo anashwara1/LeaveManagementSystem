@@ -9,5 +9,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('forgotpassword/', views.forgotpass, name='forgotpassword'),
     path('applyleave/', views.applyleave, name='applyleave'),
-    path('leavehistory/', views.leavehistory, name='leavehistory')
+    path('leavehistory/', views.leavehistory, name='leavehistory'),
+    path('profile/', views.profile, name='profile'),
 ]
