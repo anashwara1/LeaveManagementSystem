@@ -9,7 +9,7 @@ from .models import Employees
  #   return render(request, 'login.html')
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    return render(request, 'employee/dashboard.html')
 
 def logins(request):
     if request.method == 'POST':
@@ -29,12 +29,15 @@ def forgotpass(request):
     return render(request, 'forgotpassword.html')
 
 def applyleave(request):
-    return render(request, 'applyleave.html')
+    return render(request, 'employee/applyleave.html')
 
 def leavehistory(request):
-    return render(request, 'leavehistory.html')
+    return render(request, 'employee/leavehistory.html')
 
 def profile(request):
-    return render(request, 'profile.html')
+    return render(request, 'employee/profile.html')
+
+def emppage(request):
+    return render(request, 'emppage.html')
 
 
