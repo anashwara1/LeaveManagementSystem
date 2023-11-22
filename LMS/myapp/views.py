@@ -9,7 +9,7 @@ from .models import Employees
  #   return render(request, 'login.html')
 
 def dashboard(request):
-    return render(request, 'employee/dashboard.html')
+    return render(request, 'admin/dashboard.html')
 
 def logins(request):
     if request.method == 'POST':
