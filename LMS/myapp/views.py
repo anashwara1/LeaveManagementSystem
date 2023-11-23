@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Employees
+from .models import Employees, Department, Designation
+from django.http import HttpResponse
 
 # Create your views here.
 #def home(request):
@@ -41,9 +42,40 @@ def profile(request):
     return render(request, 'profile.html')
 
 def emppage(request):
-    return render(request, 'emppage.html')
+    return render(request, 'emppage.html',)
 
 def register(request):
+    if request.method == 'POST':
+        empid = request.POST['empid']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        email = request.POST['email']
+        doj = request.POST['doj']
+        desig = request.POST['desig']
+        dept = request.POST['dept']
+
+        if dept == 'Other':
+            other_dept = request.POST['other_dept']
+            dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
+        else:
+            dept_object, created = Department.objects.get_or_create(dep_name=dept)
+
+        desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+
+
+        new_user = Employees(
+            emp_id=empid,
+            firstname=fname,
+            lastname=lname,
+            email_id=email,
+            date_of_joining=doj,
+            department=dept_object,
+        )
+
+
+        new_user.save()
+        return HttpResponse("Successfully submitted")
+
     return render(request, 'register.html')
 
 
