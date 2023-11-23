@@ -1,0 +1,104 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply Leave</title>
+
+<!--  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
+   <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/admin/dashboard.css' %}" rel="stylesheet">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark" id="custom-navbar">
+    <div class="container">
+      <a class="navbar-brand">LEAVE MANAGEMENT</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+          <a class="nav-link active" aria-current="page" href="#">Apply Leave</a>
+          <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
+          <a class="nav-link" href="#">Employees</a>
+          <a class="nav-link" href="{% url 'leaveRequest' %}">Leave Requests</a>
+          <a class="nav-link" href="#">Add Employees</a>
+
+        </div>
+      </div>
+    </div>
+    <div class="navbar-nav ml-auto">
+        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+       <a class="nav-link" href="{% url 'login' %}">Logout</a>
+    </div>
+  </nav>
+  </div>
+<div class="card">
+  <div class="card-header text-center">
+    Apply Leave
+  </div>
+  <div class="card-body">
+
+    <form action="#">
+      <div class="row">
+        <div class="col-md-12">
+    <div class="form-group row">
+        <label for="leave_type" class="col-md-3 col-form-label">Leave Type:</label>
+        <div class="col-md-3">
+            <select class="form-select" id="leave_type">
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Paid Leave">Paid Leave</option>
+                <option value="Other">Other</option>
+            </select>
+          <br>
+        </div>
+    </div>
+</div>
+
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="start_date" class="col-md-3 col-form-label">Start Date:</label>
+            <div class="col-md-3">
+            <input type="date" class="form-control" id="start_date" placeholder="Start Date">
+            </div>
+          </div>
+          <br>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="end_date" class="col-md-3 col-form-label">End Date:</label>
+            <div class="col-md-3">
+            <input type="date" class="form-control" id="end_date" placeholder="End Date">
+            </div>
+          </div>
+          <br>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="reason" class="col-md-3 col-form-label">Reason:</label>
+            <div class="col-md-3">
+            <textarea class="form-control" id="reason" rows="3" placeholder="Reason for leave"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Apply Leave">
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+</body>
+</html>

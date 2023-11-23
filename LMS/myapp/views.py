@@ -8,8 +8,6 @@ from .models import Employees
 #def home(request):
  #   return render(request, 'login.html')
 
-def dashboard(request):
-    return render(request, 'admin/dashboard.html')
 
 def logins(request):
     if request.method == 'POST':
@@ -39,6 +37,27 @@ def profile(request):
 
 def emppage(request):
     return render(request, 'emppage.html')
+
+
+#admin side views
+
+def dashboard(request):
+    return render(request, 'admin/dashboard.html')
+
+def leavehistory(request):
+    return render(request, 'admin/leavehistory.html')
+
+
+def applyleave(request):
+    return render(request, 'admin/applyleave.html')
+
+
+def leaveRequest(request):
+    return render(request,'admin/leaveRequest.html')
+
+
+def profile(request):
+    return render(request, 'admin/profile.html')
 
 
 
