@@ -37,4 +37,10 @@ def leavehistory(request):
 def profile(request):
     return render(request, 'profile.html')
 
+def emppage(request):
+    return render(request, 'emppage.html')
+
+
+
+
 

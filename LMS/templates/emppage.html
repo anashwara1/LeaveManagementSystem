@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leave History</title>
+  <title>Employee Details</title>
 
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
@@ -18,55 +18,56 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-          <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
-          <a class="nav-link active" aria-current="page" href="#">Leave History</a>
+          <a class="nav-link" href="#">Dashboard</a>
+          <a class="nav-link" href="#">Apply Leave</a>
+          <a class="nav-link" href="#"> Leave History</a>
+          <a class="nav-link active" aria-current="page" href="#">Employees</a>
+          <a class="nav-link" href="#">Leave Requests</a>
+          <a class="nav-link" href="{% url 'register' %}">Add Employees</a>
         </div>
       </div>
     </div>
   <div class="navbar-nav ml-auto">
-      <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+      <a class="nav-link" href="#">Profile</a>
        <a class="nav-link" href="{% url 'login' %}">Logout</a>
     </div>
   </nav>
-<div class="card">
-  <div class="card-header text-center">
-    Leave History
-  </div>
-  <div class="card-body">
-
-    <table class="table table-striped">
+<br><br>
+<table class="table table-striped">
       <thead>
         <tr>
-          <th>Leave Type</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Status</th>
+          <th>Sl No.</th>
+          <th>Emp ID</th>
+          <th>Emp Name</th>
+          <th>Designation</th>
+          <th>DOJ</th>
+          <th>Leave Balance</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Sick Leave</td>
-          <td>2023-11-16</td>
-          <td>2023-11-18</td>
-          <td>Approved</td>
+          <td>1</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
         </tr>
         <tr>
-          <td>Paid Leave</td>
-          <td>2023-11-20</td>
-          <td>2023-11-22</td>
-          <td>Pending</td>
+           <td>2</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
         </tr>
         <tr>
-          <td>Sick Leave</td>
-          <td>2023-10-05</td>
-          <td>2023-10-06</td>
-          <td>Rejected</td>
+           <td>3</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
+          <td>NULL</td>
         </tr>
       </tbody>
     </table>
-
-  </div>
-</div>
-</body>
-</html>
