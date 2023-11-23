@@ -9,6 +9,9 @@ from .models import Employees
  #   return render(request, 'login.html')
 
 
+def empdashboard(request):
+    return render(request, 'employee/dashboard.html')
+
 def logins(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -37,6 +40,9 @@ def profile(request):
 
 def emppage(request):
     return render(request, 'emppage.html')
+
+def register(request):
+    return render(request, 'register.html')
 
 
 #admin side views
