@@ -45,6 +45,7 @@ def emppage(request):
     return render(request, 'emppage.html')
 
 def register(request):
+    departments = Department.objects.values_list('dep_name', flat=True).distinct()
     if request.method == 'POST':
         empid = request.POST['empid']
         fname = request.POST['fname']
@@ -55,7 +56,7 @@ def register(request):
         dept = request.POST['dept']
 
         if dept == 'Other':
-            other_dept = request.POST['other_dept']
+            other_dept = request.POST['other-dept']
             dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
         else:
             dept_object, created = Department.objects.get_or_create(dep_name=dept)
@@ -76,7 +77,7 @@ def register(request):
         new_user.save()
         return HttpResponse("Successfully submitted")
 
-    return render(request, 'register.html')
+    return render(request, 'register.html', {'departments': departments})
 
 
 #admin side views
