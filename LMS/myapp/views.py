@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Employees
+from .models import Employees, Department, Designation
+from django.http import HttpResponse
 
 # Create your views here.
 #def home(request):

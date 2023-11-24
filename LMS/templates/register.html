@@ -10,53 +10,65 @@
   </div>
 <br>
 
-<form>
+<form action="{% url 'register' %}" method="POST">
+    {% csrf_token %}
             <div class="form-group row">
                 <label for="employee-id" class="col-md-3 col-form-label bold-label">Emp ID:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-id" required>
+                    <input type="text" class="form-control" id="employee-id" name="empid" required >
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-firstname" class="col-md-3 col-form-label bold-label">First Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-firstname" required>
+                    <input type="text" class="form-control" id="employee-firstname" name="fname" required>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-lastname" class="col-md-3 col-form-label bold-label">Last Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-lastname" required>
+                    <input type="text" class="form-control" id="employee-lastname" name="lname" required>
                 </div>
             </div>
             <br>
              <div class="form-group row">
                 <label for="employee-mail" class="col-md-3 col-form-label bold-label">Email ID:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-mail" required>
-                </div>
-            </div>
-            <br>
-            <div class="form-group row">
-                <label for="employee-designation" class="col-md-3 col-form-label bold-label">Designation:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-designation" required>
+                    <input type="email" class="form-control" id="employee-mail" name="email" required>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-department" class="col-md-3 col-form-label bold-label">Department:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-department" required>
+                    <select id="employee-department" name="dept" onchange="showInput()">
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                <br><br>
+                <div id="other-input" style="display: none;">
+                     <label for="other-department">Other:</label>
+                     <input type="text" id="other-department" name="other-dept">
+                </div>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-designation" class="col-md-3 col-form-label bold-label">Designation:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-designation" name="desig" required>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-doj" class="col-md-3 col-form-label bold-label">Date of Joining:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-doj" required>
+                    <input type="date" class="form-control" id="employee-doj" name="doj" required>
                 </div>
             </div>
             <br>

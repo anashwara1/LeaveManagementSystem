@@ -9,7 +9,7 @@ from django.db import models
 
 
 class Department(models.Model):
-    department_id = models.CharField(db_column='Department_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    department_id = models.AutoField(db_column='Department_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     dep_name = models.CharField(db_column='Dep_Name', max_length=40, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -18,7 +18,7 @@ class Department(models.Model):
 
 
 class Designation(models.Model):
-    designation_id = models.CharField(db_column='Designation_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    designation_id = models.AutoField(db_column='Designation_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     designation = models.CharField(db_column='Designation', max_length=50, blank=True, null=True)  # Field name made lowercase.
     dep = models.ForeignKey(Department, models.DO_NOTHING, db_column='Dep_ID', blank=True, null=True)  # Field name made lowercase.
 
@@ -46,7 +46,7 @@ class Employees(models.Model):
 
 
 class Leavebalance(models.Model):
-    balance_id = models.CharField(db_column='Balance_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    balance_id = models.AutoField(db_column='Balance_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EmpID', blank=True, null=True)  # Field name made lowercase.
     leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
     balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
@@ -57,7 +57,7 @@ class Leavebalance(models.Model):
 
 
 class LeaveRequest(models.Model):
-    leave_request_id = models.CharField(db_column='Leave_Request_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    leave_request_id = models.AutoField(db_column='Leave_Request_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     emp = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)  # Field name made lowercase.
     leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
     startdate = models.DateField(db_column='StartDate', blank=True, null=True)  # Field name made lowercase.
@@ -71,7 +71,7 @@ class LeaveRequest(models.Model):
 
 
 class LeaveTypes(models.Model):
-    leave_type_id = models.CharField(db_column='Leave_Type_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    leave_type_id = models.AutoField(db_column='Leave_Type_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     leave_type_name = models.CharField(db_column='Leave_Type_Name', max_length=50, blank=True, null=True)  # Field name made lowercase.
     max_leave_days = models.IntegerField(db_column='Max_Leave_Days', blank=True, null=True)  # Field name made lowercase.
 
@@ -81,7 +81,7 @@ class LeaveTypes(models.Model):
 
 
 class Managers(models.Model):
-    manager_id = models.CharField(db_column='Manager_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    manager_id = models.AutoField(db_column='Manager_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     emp = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EMP_ID', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
