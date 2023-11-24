@@ -50,11 +50,11 @@ def register(request):
 def dashboard(request):
     return render(request, 'admin/dashboard.html')
 
-def leavehistory(request):
+def adminleavehistory(request):
     return render(request, 'admin/leavehistory.html')
 
 
-def applyleave(request):
+def adminapplyleave(request):
     return render(request, 'admin/applyleave.html')
 
 
@@ -62,7 +62,7 @@ def leaveRequest(request):
     return render(request,'admin/leaveRequest.html')
 
 
-def profile(request):
+def adminprofile(request):
     return render(request, 'admin/profile.html')
 
 

@@ -1,42 +1,11 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Details</title>
 
-  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" >
-  <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
-  <link href="{% static 'css/dataTables.css' %}" rel="stylesheet">
-  <script type="text/javascript" src="{% static 'js/dataTables.js' %}"></script>
 
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand">LEAVE MANAGEMENT</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-          <a class="nav-link" href="#">Apply Leave</a>
-          <a class="nav-link" href="#"> Leave History</a>
-          <a class="nav-link active" aria-current="page" href="#">Employees</a>
-          <a class="nav-link" href="#">Leave Requests</a>
-          <a class="nav-link" href="{% url 'register' %}">Add Employees</a>
-        </div>
-      </div>
-    </div>
-  <div class="navbar-nav ml-auto">
-      <a class="nav-link" href="#">Profile</a>
-       <a class="nav-link" href="{% url 'login' %}">Logout</a>
-    </div>
-  </nav>
-<br><br>
-<table class="table table-striped" id="details">
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Employees{% endblock %}
+
+{% block content %}
+  <table class="table table-striped" id="details">
       <thead>
         <tr>
           <th>Sl No.</th>
@@ -53,5 +22,4 @@
             $('#details').DataTable();
         });
     </script>
-</body>
-</html>
+{% endblock %}

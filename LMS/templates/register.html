@@ -1,40 +1,10 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Details</title>
 
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
-  <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand">LEAVE MANAGEMENT</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="#">Dashboard</a>
-          <a class="nav-link" href="#">Apply Leave</a>
-          <a class="nav-link" href="#"> Leave History</a>
-          <a class="nav-link" href="{% url 'employee' %}"> Employees</a>
-          <a class="nav-link" href="#">Leave Requests</a>
-          <a class="nav-link active" aria-current="page" href="#">Add Employees</a>
-        </div>
-      </div>
-    </div>
-  <div class="navbar-nav ml-auto">
-      <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-       <a class="nav-link" href="{% url 'login' %}">Logout</a>
-    </div>
-  </nav>
-<br>
-<div class="container">
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Add Employees{% endblock %}
+
+{% block content %}
  <div class="card-header text-center">
     Register User
   </div>
@@ -95,6 +65,4 @@
             <button>Submit</button>
         </form>
 
-</div>
-</body>
-</html>
+{% endblock %}

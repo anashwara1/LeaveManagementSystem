@@ -1,37 +1,10 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+<!-- applyleave.html -->
 
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
-</head>
-<body>
+{% extends 'admin/admin_base.html' %}
 
+{% block title %}Profile{% endblock %}
 
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-      <a class="navbar-brand">LEAVE MANAGEMENT</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="{% url 'emp_dashboard' %}">Dashboard</a>
-          <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
-          <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
-        </div>
-      </div>
-    </div>
-      <div class="navbar-nav ml-auto">
-          <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-       <a class="nav-link" href="{% url 'login' %}">Logout</a>
-    </div>
-  </nav>
-
+{% block content %}
    <div class="card">
   <div class="card-header text-center">
     Employee Profile
@@ -99,5 +72,4 @@
     </div>
 </div>
    </div>
-</body>
-</html>
+{% endblock %}
