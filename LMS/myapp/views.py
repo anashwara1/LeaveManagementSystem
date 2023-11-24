@@ -79,6 +79,27 @@ def register(request):
     return render(request, 'register.html')
 
 
+#admin side views
+
+def dashboard(request):
+    return render(request, 'admin/dashboard.html')
+
+def adminleavehistory(request):
+    return render(request, 'admin/leavehistory.html')
+
+
+def adminapplyleave(request):
+    return render(request, 'admin/applyleave.html')
+
+
+def leaveRequest(request):
+    return render(request,'admin/leaveRequest.html')
+
+
+def adminprofile(request):
+    return render(request, 'admin/profile.html')
+
+
 
 
 
