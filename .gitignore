@@ -1,6 +1,6 @@
 #ignore virtual environment
 virenv
 .env
-
+.idea
 
 
