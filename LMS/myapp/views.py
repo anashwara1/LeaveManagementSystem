@@ -8,6 +8,8 @@ from .models import Employees
 #def home(request):
  #   return render(request, 'login.html')
 
+def dashboard(request):
+    return render(request, 'admin/dashboard.html')
 
 def empdashboard(request):
     return render(request, 'employee/dashboard.html')
@@ -42,6 +44,37 @@ def emppage(request):
     return render(request, 'emppage.html')
 
 def register(request):
+    if request.method == 'POST':
+        empid = request.POST['empid']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        email = request.POST['email']
+        doj = request.POST['doj']
+        desig = request.POST['desig']
+        dept = request.POST['dept']
+
+        if dept == 'Other':
+            other_dept = request.POST['other_dept']
+            dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
+        else:
+            dept_object, created = Department.objects.get_or_create(dep_name=dept)
+
+        desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+
+
+        new_user = Employees(
+            emp_id=empid,
+            firstname=fname,
+            lastname=lname,
+            email_id=email,
+            date_of_joining=doj,
+            department=dept_object,
+        )
+
+
+        new_user.save()
+        return HttpResponse("Successfully submitted")
+
     return render(request, 'register.html')
 
 
