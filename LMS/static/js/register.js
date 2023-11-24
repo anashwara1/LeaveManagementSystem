@@ -1,4 +1,3 @@
-<script>
         function showInput() {
             var departmentSelect = document.getElementById("employee-department");
             var otherInput = document.getElementById("other-input");
@@ -9,4 +8,4 @@
                 otherInput.style.display = "none";
             }
         }
-    </script>
+
