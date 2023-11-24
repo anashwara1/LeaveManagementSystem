@@ -6,20 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Details</title>
 
+   <script type="text/javascript" src="{% static 'js/register.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
-    <script>
-        function showInput() {
-            var departmentSelect = document.getElementById("employee-department");
-            var otherInput = document.getElementById("other-input");
 
-            if (departmentSelect.value === "Other") {
-                otherInput.style.display = "block";
-            } else {
-                otherInput.style.display = "none";
-            }
-        }
-    </script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark">

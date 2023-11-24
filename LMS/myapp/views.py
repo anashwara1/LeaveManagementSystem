@@ -42,7 +42,7 @@ def profile(request):
     return render(request, 'profile.html')
 
 def emppage(request):
-    return render(request, 'emppage.html',)
+    return render(request, 'emppage.html')
 
 def register(request):
     if request.method == 'POST':
