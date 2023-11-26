@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Employees, Department, Designation
 from django.http import HttpResponse
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 #def home(request):
@@ -17,14 +18,20 @@ def empdashboard(request):
 
 def logins(request):
     if request.method == 'POST':
-        username = request.POST['username']
+        email = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
-            login(request, user)
-            return redirect('dashboard')
+            if user.is_superuser:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                login(request, user)
+                return redirect('emp_dashboard')
+
         # Handle invalid login here
         else:
+            print("Invalid login attempt.")
             messages.error(request, "Invalid Credentials. Please check your username and password.")
 
     return render(request, 'login.html')
@@ -54,6 +61,7 @@ def register(request):
         doj = request.POST['doj']
         desig = request.POST['desig']
         dept = request.POST['dept']
+        password = request.POST['password']
 
         if dept == 'Other':
             other_dept = request.POST['other-dept']
@@ -63,18 +71,16 @@ def register(request):
 
         desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
-
-        new_user = Employees(
+        new_user = get_user_model().objects.create_user(
+            email=email,
+            password=password,
             emp_id=empid,
             firstname=fname,
             lastname=lname,
-            email_id=email,
             date_of_joining=doj,
             department=dept_object,
         )
 
-
-        new_user.save()
         return HttpResponse("Successfully submitted")
 
     return render(request, 'register.html', {'departments': departments})
