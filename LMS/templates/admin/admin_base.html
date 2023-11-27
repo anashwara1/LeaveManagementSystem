@@ -26,18 +26,18 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-          <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
-          <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
-          <a class="nav-link" href="{% url 'employees' %}">Employees</a>
-          <a class="nav-link" href="{% url 'leaveRequest' %}">Leave Requests</a>
-          <a class="nav-link" href="{% url 'register' %}">Add Employees</a>
+          <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+          <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="{% url 'applyleave' %}">Apply Leave</a>
+          <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="{% url 'leavehistory' %}">Leave History</a>
+          <a class="nav-link {% if request.path == '/employees/' %}active{% endif %}" href="{% url 'employees' %}">Employees</a>
+          <a class="nav-link {% if request.path == '/leaveRequest/' %}active{% endif %}" href="{% url 'leaveRequest' %}">Leave Requests</a>
+          <a class="nav-link {% if request.path == '/register_user/' %}active{% endif %}" href="{% url 'register' %}">Add Employees</a>
         </div>
       </div>
     </div>
     <div class="navbar-nav ml-auto">
-      <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-      <a class="nav-link" href="{% url 'login' %}">Logout</a>
+      <a class="nav-link {% if request.path == '/profile/' %}active{% endif %}" href="{% url 'profile' %}">Profile</a>
+      <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="{% url 'login' %}">Logout</a>
     </div>
   </nav>
 
