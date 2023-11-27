@@ -1,7 +1,5 @@
-<!-- base.html -->
 
 {% load static %}
-
 
 <html lang="en">
 <head>
@@ -29,8 +27,8 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-          <a class="nav-link" href="{% url 'admin_applyleave' %}">Apply Leave</a>
-          <a class="nav-link" href="{% url 'admin_leavehistory' %}">Leave History</a>
+          <a class="nav-link" href="{% url 'applyleave' %}">Apply Leave</a>
+          <a class="nav-link" href="{% url 'leavehistory' %}">Leave History</a>
           <a class="nav-link" href="{% url 'employees' %}">Employees</a>
           <a class="nav-link" href="{% url 'leaveRequest' %}">Leave Requests</a>
           <a class="nav-link" href="{% url 'register' %}">Add Employees</a>

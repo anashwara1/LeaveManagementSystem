@@ -7,14 +7,7 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 
 # Create your views here.
-#def home(request):
- #   return render(request, 'login.html')
 
-def dashboard(request):
-    return render(request, 'admin/dashboard.html')
-
-def empdashboard(request):
-    return render(request, 'employee/dashboard.html')
 
 def logins(request):
     if request.method == 'POST':
@@ -39,6 +32,13 @@ def logins(request):
 def forgotpass(request):
     return render(request, 'forgotpassword.html')
 
+#employee
+def empdashboard(request):
+    return render(request, 'employee/dashboard.html')
+
+
+
+#common
 def applyleave(request):
     return render(request, 'applyleave.html')
 
@@ -48,9 +48,8 @@ def leavehistory(request):
 def profile(request):
     return render(request, 'profile.html')
 
-def emppage(request):
-    return render(request, 'emppage.html')
 
+#admin
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
     if request.method == 'POST':
@@ -86,25 +85,14 @@ def register(request):
     return render(request, 'register.html', {'departments': departments})
 
 
-#admin side views
-
 def dashboard(request):
     return render(request, 'admin/dashboard.html')
-
-def adminleavehistory(request):
-    return render(request, 'admin/leavehistory.html')
-
-
-def adminapplyleave(request):
-    return render(request, 'admin/applyleave.html')
-
 
 def leaveRequest(request):
     return render(request,'admin/leaveRequest.html')
 
-
-def adminprofile(request):
-    return render(request, 'admin/profile.html')
+def emppage(request):
+    return render(request, 'emppage.html')
 
 
 
