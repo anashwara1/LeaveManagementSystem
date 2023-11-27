@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Employees, Department, Designation
+from .models import Employees, Department, Designation,Leavebalance,LeaveTypes,LeaveRequest,Managers
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -78,6 +79,7 @@ def register(request):
             lastname=lname,
             date_of_joining=doj,
             department=dept_object,
+
         )
 
         return HttpResponse("Successfully submitted")
@@ -93,6 +95,51 @@ def leaveRequest(request):
 
 def emppage(request):
     return render(request, 'emppage.html')
+
+
+#retrieving data from database to profile
+
+@login_required
+def profile(request):
+    try:
+        employee = Employees.objects.get(email=request.user.email)
+
+
+        emp_id = employee.emp_id
+        firstname = employee.firstname
+        lastname = employee.lastname
+        department = employee.department
+        try:
+          designation = Designation.objects.get(dep=department)
+        except Designation.DoesNotExist:
+            designation= None
+        # Name = firstname + " " + lastname
+        # department = employee.department
+        # designation = department.dep.designation.designation if department and department.dep else None
+        # department_name = department.Dep_Name
+        # dateOfJoining = employee.date_of_joining
+        # Manager = employee.managed_by
+        try:
+            leave_balance = Leavebalance.objects.get(empid=employee)
+        except Leavebalance.DoesNotExist:
+            # Handle the case where leave balance is not found
+            leave_balance = None
+        return render(request, 'profile.html', {
+            'employee' : employee,
+            'emp_id' : emp_id,
+            'firstname': firstname,
+            'lastname': lastname,
+
+             'designation' : designation,
+            'department' : department,
+            'leave_balance' : leave_balance,
+            # 'dateOfJoining' : dateOfJoining,
+            # 'Manager' :Manager,
+        })
+    except Employees.DoesNotExist:
+        # Handle the case where the employee is not found
+        return render(request, 'profile.html', {'error': 'Employee not found'})
+
 
 
 

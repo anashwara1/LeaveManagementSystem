@@ -80,7 +80,7 @@ class Employees(AbstractUser, PermissionsMixin):
 
 class Leavebalance(models.Model):
     balance_id = models.AutoField(db_column='Balance_ID', primary_key=True)  # Field name made lowercase.
-    empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EmpID', blank=True, null=True)  # Field name made lowercase.
+    empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)  # Field name made lowercase.
     leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
     balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
 
