@@ -1,5 +1,8 @@
-{% extends 'employee/base.html' %}
-{% block title %}Apply Leave{% endblock %}
+{% if user.is_superuser %}
+    {% include 'admin/admin_base.html' %}
+{% else %}
+    {% include 'employee/base.html' %}
+{% endif %}
 
 {% block content %}
 
