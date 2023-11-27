@@ -6,10 +6,10 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 
 class Department(models.Model):
-    department_id = models.AutoField(db_column='Department_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    department_id = models.AutoField(db_column='Department_ID', primary_key=True)  # Field name made lowercase.
     dep_name = models.CharField(db_column='Dep_Name', max_length=40, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -18,7 +18,7 @@ class Department(models.Model):
 
 
 class Designation(models.Model):
-    designation_id = models.AutoField(db_column='Designation_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    designation_id = models.AutoField(db_column='Designation_ID', primary_key=True)  # Field name made lowercase.
     designation = models.CharField(db_column='Designation', max_length=50, blank=True, null=True)  # Field name made lowercase.
     dep = models.ForeignKey(Department, models.DO_NOTHING, db_column='Dep_ID', blank=True, null=True)  # Field name made lowercase.
 
@@ -26,27 +26,60 @@ class Designation(models.Model):
         managed = True
         db_table = 'Designation'
 
+class CustomUserManager(BaseUserManager):
 
-class Employees(models.Model):
+    use_in_migrations = True
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Super user must have is_staff true')
+
+        return self.create_user(email, password, **extra_fields)
+
+
+class Employees(AbstractUser, PermissionsMixin):
+    username = None
     emp_id = models.CharField(db_column='Emp_ID', primary_key=True, max_length=10)  # Field name made lowercase.
     firstname = models.CharField(db_column='FirstName', max_length=50, blank=True, null=True)  # Field name made lowercase.
     lastname = models.CharField(db_column='LastName', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    email_id = models.CharField(db_column='Email_id', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    email = models.CharField(db_column='email', max_length=100, unique=True, default='anu@mail.com')  # Field name made lowercase.
+    password = models.CharField(max_length=128, null=True, blank=True)
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='Department_id', blank=True, null=True)  # Field name made lowercase.
     date_of_joining = models.DateField(db_column='Date_of_Joining', blank=True, null=True)  # Field name made lowercase.
     managed_by = models.ForeignKey('Managers', models.DO_NOTHING, db_column='Managed_by', blank=True, null=True)  # Field name made lowercase.
-    password = models.CharField(db_column='Password', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    isactive = models.CharField(db_column='ISACTIVE', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    is_active = models.BooleanField(default=True)  # Field name made lowercase.
     updated_at = models.DateTimeField(db_column='Updated_at', blank=True, null=True)  # Field name made lowercase.
     created_at = models.DateTimeField(db_column='Created_at', blank=True, null=True)  # Field name made lowercase.
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+
+    def natural_key(self):
+        return (self.email,)
     class Meta:
         managed = True
         db_table = 'Employees'
 
 
 class Leavebalance(models.Model):
-    balance_id = models.AutoField(db_column='Balance_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    balance_id = models.AutoField(db_column='Balance_ID', primary_key=True)  # Field name made lowercase.
     empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EmpID', blank=True, null=True)  # Field name made lowercase.
     leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
     balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
@@ -57,7 +90,7 @@ class Leavebalance(models.Model):
 
 
 class LeaveRequest(models.Model):
-    leave_request_id = models.AutoField(db_column='Leave_Request_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    leave_request_id = models.AutoField(db_column='Leave_Request_ID', primary_key=True)  # Field name made lowercase.
     emp = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)  # Field name made lowercase.
     leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
     startdate = models.DateField(db_column='StartDate', blank=True, null=True)  # Field name made lowercase.
@@ -71,7 +104,7 @@ class LeaveRequest(models.Model):
 
 
 class LeaveTypes(models.Model):
-    leave_type_id = models.AutoField(db_column='Leave_Type_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    leave_type_id = models.AutoField(db_column='Leave_Type_ID', primary_key=True)  # Field name made lowercase.
     leave_type_name = models.CharField(db_column='Leave_Type_Name', max_length=50, blank=True, null=True)  # Field name made lowercase.
     max_leave_days = models.IntegerField(db_column='Max_Leave_Days', blank=True, null=True)  # Field name made lowercase.
 
@@ -81,7 +114,7 @@ class LeaveTypes(models.Model):
 
 
 class Managers(models.Model):
-    manager_id = models.AutoField(db_column='Manager_ID', primary_key=True, max_length=10)  # Field name made lowercase.
+    manager_id = models.AutoField(db_column='Manager_ID', primary_key=True)  # Field name made lowercase.
     emp = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EMP_ID', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
