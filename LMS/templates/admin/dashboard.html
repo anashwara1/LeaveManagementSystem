@@ -39,28 +39,10 @@
         <th>Status</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>Emp_1</td>
-        <td>Sick Leave</td>
-        <td>2023-11-16</td>
-        <td>2023-11-18</td>
-        <td>Approved</td>
-      </tr>
-      <tr>
-        <td>Emp_2</td>
-        <td>Paid Leave</td>
-        <td>2023-11-20</td>
-        <td>2023-11-22</td>
-        <td>Pending</td>
-      </tr>
-      <tr>
-        <td>Emp_3</td>
-        <td>Sick Leave</td>
-        <td>2023-10-05</td>
-        <td>2023-10-06</td>
-        <td>Rejected</td>
-      </tr>
-    </tbody>
   </table>
+<script>
+        $(document).ready(function() {
+            $('.table').DataTable();
+        });
+    </script>
 {% endblock %}
