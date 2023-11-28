@@ -10,7 +10,7 @@ urlpatterns = [
     #employee
     path('emp_dashboard/', views.empdashboard, name='emp_dashboard'),
     #admin
-    path('leaveRequest',views.leaveRequest,name='leaveRequest'),
+    path('leaveRequest', views.leaveRequest, name='leaveRequest'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('employees/', views.emppage, name='employees'),
     path('register_user/', views.register, name='register'),
