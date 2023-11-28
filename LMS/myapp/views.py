@@ -91,7 +91,7 @@ def register(request):
 
         send_mail(subject, message, from_email, recipient_list)
 
-        return HttpResponse("Successfully submitted")
+        messages.success(request, 'Employee registered successfully and mail is sent.')
 
     return render(request, 'register.html', {'departments': departments})
 
