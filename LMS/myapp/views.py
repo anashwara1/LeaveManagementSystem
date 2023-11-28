@@ -1,11 +1,14 @@
+from decouple import config
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from .models import Department, Designation
 from django.contrib.auth.models import User
-from .models import Employees, Department, Designation,Leavebalance,LeaveTypes,LeaveRequest,Managers
+from .models import Employees, Department, Designation, Leavebalance, LeaveTypes, LeaveRequest, Managers
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -79,8 +82,14 @@ def register(request):
             lastname=lname,
             date_of_joining=doj,
             department=dept_object,
-
         )
+
+        subject = 'Registration Confirmation'
+        message = f'Your account have been successfully registered, {fname} {lname}!'
+        from_email = config('EMAIL_HOST_USER')
+        recipient_list = [email]
+
+        send_mail(subject, message, from_email, recipient_list)
 
         return HttpResponse("Successfully submitted")
 
@@ -91,7 +100,7 @@ def dashboard(request):
     return render(request, 'admin/dashboard.html')
 
 def leaveRequest(request):
-    return render(request,'admin/leaveRequest.html')
+    return render(request, 'admin/leaveRequest.html')
 
 def emppage(request):
     return render(request, 'emppage.html')
