@@ -24,49 +24,49 @@
             <div class="form-group row">
                 <label for="employee-id" class="col-md-3 col-form-label">Emp ID:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-id" disabled>
+                    <input type="text" class="form-control" id="employee-id" value="{{ employee.emp_id }}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-name" disabled>
+                    <input type="text" class="form-control" id="employee-name" value="{{ employee.firstname }} {{ employee.lastname }}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-designation" class="col-md-3 col-form-label">Designation:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-designation" disabled>
+                    <input type="text" class="form-control" id="employee-designation" value="{{ designation.designation }}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-department" class="col-md-3 col-form-label">Department:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-department" disabled>
+                    <input type="text" class="form-control" id="employee-department"  value="{{employee.department.dep_name}}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-doj" class="col-md-3 col-form-label">Date of Joining:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-doj" disabled>
+                    <input type="text" class="form-control" id="employee-doj" value="{{ employee.date_of_joining }}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="employee-manager" class="col-md-3 col-form-label">Manager:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-manager" disabled>
+                    <input type="text" class="form-control" id="employee-manager" value="{{ employee.managed_by }}" disabled>
                 </div>
             </div>
             <br>
             <div class="form-group row">
                 <label for="leave-balance" class="col-md-3 col-form-label">Leave Balance:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="leave-balance" disabled>
+                    <input type="text" class="form-control" id="leave-balance" value="{{ leave_balance.balance }}" disabled>
                 </div>
             </div>
         </form>
