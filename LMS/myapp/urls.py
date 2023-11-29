@@ -18,5 +18,6 @@ urlpatterns = [
     path('applyleave/', views.applyleave, name='applyleave'),
     path('leavehistory/', views.leavehistory, name='leavehistory'),
     path('profile/', views.profile, name='profile'),
+    path('change_password/', views.changepassword, name='changepassword'),
 
 ]
