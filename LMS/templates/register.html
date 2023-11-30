@@ -5,6 +5,13 @@
 {% block title %}Add Employees{% endblock %}
 
 {% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
  <div class="card-header text-center">
     Register User
   </div>
@@ -81,5 +88,6 @@
     <br>
             <button>Submit</button>
         </form>
+
 
 {% endblock %}
