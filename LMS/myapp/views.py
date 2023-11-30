@@ -23,6 +23,7 @@ def logins(request):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
+        request.session['logged_user'] = email
         if user is not None:
             if user.is_superuser:
                 login(request, user)
@@ -67,6 +68,26 @@ def empdashboard(request):
 
 # common
 def applyleave(request):
+    if request.method == 'POST':
+        leavetype = request.POST['leavetype']
+        startdate = request.POST['startdate']
+        enddate = request.POST['enddate']
+        reason = request.POST['reason']
+
+        leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
+        emp_mail = request.session.get('logged_user')
+        emp = Employees.objects.get(email=emp_mail)
+        new_leave = LeaveRequest(
+            startdate=startdate,
+            enddate=enddate,
+            reason=reason,
+            leavetypeid=leaveTypeid_object,
+            status='Pending',
+            emp=emp
+        )
+
+        new_leave.save()
+        messages.success(request, 'Leave Request sent successfully.')
     return render(request, 'applyleave.html')
 
 
@@ -140,8 +161,8 @@ def changepassword(request):
         otp = request.POST['otp']
         sentotp = request.session.get('reset_otp')
 
-        if int(sentotp)!= int(otp):
-            messages.error(request, f'OTP incorrect. Enter the correct otp{sentotp}')
+        if int(sentotp) != int(otp):
+            messages.error(request, 'OTP incorrect. Enter the correct otp')
         else:
             if newpass != confirmpass:
                 messages.error(request, 'Password entered must be the same')
