@@ -1,9 +1,9 @@
-
-
 {% extends 'admin/admin_base.html' %}
-
+{% load static %}
 {% block title %}Add Employees{% endblock %}
-
+{% block additional_head %}
+    <script type="text/javascript" src="{% static 'js/register.js' %}"></script>
+{% endblock %}
 {% block content %}
 {% if messages %}
     {% for message in messages %}
@@ -88,6 +88,5 @@
     <br>
             <button>Submit</button>
         </form>
-
 
 {% endblock %}

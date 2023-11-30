@@ -1,9 +1,12 @@
+{% load static %}
 {% if user.is_superuser %}
     {% include 'admin/admin_base.html' %}
 {% else %}
     {% include 'employee/base.html' %}
 {% endif %}
-
+{% block additional_head %}
+    <script type="text/javascript" src="{% static 'js/applyleave.js' %}"></script>
+{% endblock %}
 {% block content %}
 
 {% if messages %}
@@ -78,12 +81,5 @@
 
   </div>
 </div>
-<script>
-function updateEndDateMin() {
-    var startDate = document.getElementById('start_date').value;
-    document.getElementById('end_date').min = startDate;
-}
-</script>
 {% endblock %}
-</body>
-</html>
+
