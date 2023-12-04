@@ -1,4 +1,4 @@
-
+{% load static %}
 {% if user.is_superuser %}
     {% include 'admin/admin_base.html' %}
 {% else %}
@@ -14,9 +14,12 @@
   <div class="container-fluid h-100">
     <div class="row h-100 justify-content-center align-items-center">
         <div class="col-md-4 text-center">
-            <img src="https://picsum.photos/400/200" alt="Employee Image" class="img-fluid rounded-circle" style="width: 150px; height: 150px; margin-bottom: 20px;">
+             {% if profile_image %}
+             <img src="{{ profile_image.url }}" alt="{{ employee.firstname }}'s Profile Image" class="img-fluid rounded-circle" >
+             {% else %}
+             <img src="{% static 'no_profile_img/no.jpg' %}" alt="Default Profile Image" class="img-fluid rounded-circle" >
+             {% endif %}
         </div>
-    </div>
   </div>
     <div class="card-body">
     <div class="container">

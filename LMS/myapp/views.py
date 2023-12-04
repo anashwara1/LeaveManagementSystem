@@ -100,8 +100,10 @@ def profile(request):
 
 
 # admin
+
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
+
     if request.method == 'POST':
         empid = request.POST['empid']
         fname = request.POST['fname']
@@ -112,6 +114,18 @@ def register(request):
         dept = request.POST['dept']
         password = request.POST['password']
 
+        # Process the file upload
+        employee_image = request.FILES.get('employee_image', None)
+
+        # Save the uploaded image
+        if employee_image:
+            file_name = f"{empid}_{employee_image.name}"
+            with open(f"media/profile_images/{file_name}", 'wb') as destination:
+                for chunk in employee_image.chunks():
+                    destination.write(chunk)
+        else:
+            file_name = None
+
         if dept == 'Other':
             other_dept = request.POST['other-dept']
             dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
@@ -121,23 +135,26 @@ def register(request):
         desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
         new_user = get_user_model().objects.create_user(
-            email=email,
-            password=password,
             emp_id=empid,
             firstname=fname,
             lastname=lname,
+            email=email,
+            password=password,
             date_of_joining=doj,
             department=dept_object,
+            profile_image=f"profile_images/{file_name}" if file_name else None
         )
 
         subject = 'Registration Confirmation'
-        message = f'Your account have been successfully registered, {fname} {lname}!'
+        message = f'Your account has been successfully registered, {fname} {lname}!'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
         send_mail(subject, message, from_email, recipient_list)
 
-        messages.success(request, 'Employee registered successfully and mail is sent.')
+        messages.success(request, 'Employee registered successfully, and an email is sent.')
+
+       # return redirect('login')  # Redirect to login page after successful registration
 
     return render(request, 'register.html', {'departments': departments})
 
@@ -181,6 +198,7 @@ def changepassword(request):
 
 # retrieving data from database to profile
 
+
 @login_required
 def profile(request):
     try:
@@ -190,33 +208,22 @@ def profile(request):
         firstname = employee.firstname
         lastname = employee.lastname
         department = employee.department
-        try:
-            designation = Designation.objects.get(dep=department)
-        except Designation.DoesNotExist:
-            designation = None
-        # Name = firstname + " " + lastname
-        # department = employee.department
-        # designation = department.dep.designation.designation if department and department.dep else None
-        # department_name = department.Dep_Name
-        # dateOfJoining = employee.date_of_joining
-        # Manager = employee.managed_by
-        try:
-            leave_balance = Leavebalance.objects.get(empid=employee)
-        except Leavebalance.DoesNotExist:
-            # Handle the case where leave balance is not found
-            leave_balance = None
-        return render(request, 'profile.html', {
-            'employee': employee,
-            'emp_id': emp_id,
-            'firstname': firstname,
-            'lastname': lastname,
+        profile_image = employee.profile_image
 
-            'designation': designation,
-            'department': department,
-            'leave_balance': leave_balance,
-            # 'dateOfJoining' : dateOfJoining,
-            # 'Manager' :Manager,
-        })
+        try:
+             leave_balance = Leavebalance.objects.get(empid=employee)
+        except Leavebalance.DoesNotExist:
+                leave_balance = None
+
+        return render(request, 'profile.html', {
+                'employee': employee,
+                'emp_id': emp_id,
+                'firstname': firstname,
+                'lastname': lastname,
+                'profile_image': profile_image,
+                'department': department,
+                'leave_balance': leave_balance,
+            })
+
     except Employees.DoesNotExist:
-        # Handle the case where the employee is not found
-        return render(request, 'profile.html', {'error': 'Employee not found'})
+            return render(request, 'profile.html', {'error': 'Employee not found'})
