@@ -46,8 +46,12 @@ def forgotpass(request):
 
         otp = random.randint(1000, 9999)
 
-        subject = 'Changing Password'
-        message = f'Change your password using this otp : {otp}'
+        subject = 'Forgot Password OTP'
+        otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
+        otp=f'{otp}'
+        otp_template = otp_template.replace('\\n', '\n')
+        message = otp_template.format(otp=otp)
+        # message = f'Change your password using this otp : {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
         send_mail(subject, message, from_email, recipient_list)
@@ -151,7 +155,15 @@ def register(request):
         )
 
         subject = 'Registration Confirmation'
-        message = f'Your account has been successfully registered, {fname} {lname}!'
+        # message = f'Your account has been successfully registered, {fname} {lname}!'
+        message_template = config('MESSAGE_TEMPLATE')
+        fname = f'{fname}'
+        lname = f'{lname}'
+        email = f'{email}'
+        password = f'{password}'
+
+        message_template = message_template.replace('\\n', '\n')
+        message = message_template.format(fname=fname, lname=lname, email=email, password=password)
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
