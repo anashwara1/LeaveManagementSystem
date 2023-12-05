@@ -40,26 +40,37 @@ def logins(request):
     return render(request, 'login.html')
 
 
+User = get_user_model()
+
 def forgotpass(request):
     if request.method == 'POST':
         email = request.POST['email']
 
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+
+            messages.error(request, 'This email is not registered. Please enter a registered email address.')
+            return redirect('forgotpassword')
+
+        # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
 
         subject = 'Changing Password'
-        message = f'Change your password using this otp : {otp}'
+        message = f'Change your password using this OTP: {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
+
         send_mail(subject, message, from_email, recipient_list)
 
         request.session['reset_otp'] = otp
         request.session['reset_email'] = email
 
-        messages.success(request, 'Mail is sent. Please check your mail for the otp')
+        messages.success(request, 'Mail is sent. Please check your mail for the OTP')
         return redirect('changepassword')
 
     return render(request, 'forgotpassword.html')
-
 
 # employee
 def empdashboard(request):
