@@ -17,7 +17,7 @@
   </div>
 <br>
 
-<form action="{% url 'register' %}" method="POST">
+<form action="{% url 'register' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
             <div class="form-group row">
                 <label for="employee-id" class="col-md-3 col-form-label bold-label">Emp ID:</label>
@@ -85,6 +85,13 @@
                 </div>
             </div>
             <br>
+            <div class="form-group row">
+                <label for="employee-image" class="col-md-3 col-form-label bold-label">Employee Image:</label>
+                <div class="col-md-9">
+                     <input type="file" class="form-control-file" id="employee-image" name="employee_image" accept="image/*">
+                </div>
+            </div>
+
     <br>
             <button>Submit</button>
         </form>
