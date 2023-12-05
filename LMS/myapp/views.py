@@ -92,8 +92,13 @@ def applyleave(request):
 
 
 def leavehistory(request):
-    return render(request, 'leavehistory.html')
-
+    mail = request.session.get('logged_user')
+    user = Employees.objects.get(email=mail)
+    emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
+    context = {
+        'leave_requests': emp_leaves,
+    }
+    return render(request, 'leavehistory.html', context)
 
 def profile(request):
     return render(request, 'profile.html')

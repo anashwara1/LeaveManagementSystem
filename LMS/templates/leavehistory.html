@@ -18,6 +18,16 @@
           <th>Status</th>
         </tr>
       </thead>
+        <tbody>
+            {% for leave_request in leave_requests %}
+            <tr>
+                <td>{{ leave_request.leavetypeid.leave_type_name }}</td>
+                <td>{{ leave_request.startdate }}</td>
+                <td>{{ leave_request.enddate }}</td>
+                <td>{{ leave_request.status }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
     </table>
 <script>
         $(document).ready(function() {
