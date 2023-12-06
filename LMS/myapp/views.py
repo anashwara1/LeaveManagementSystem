@@ -1,6 +1,6 @@
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -111,6 +111,8 @@ def leavehistory(request):
     }
     return render(request, 'leavehistory.html', context)
 
+
+
 def profile(request):
     return render(request, 'profile.html')
 
@@ -129,6 +131,7 @@ def register(request):
         desig = request.POST['desig']
         dept = request.POST['dept']
         password = request.POST['password']
+        ismanager = request.POST['ismanager']
 
         # Process the file upload
         employee_image = request.FILES.get('employee_image', None)
@@ -150,7 +153,7 @@ def register(request):
 
         desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
-        new_user = get_user_model().objects.create_user(
+        new_user = Employees.objects.create_user(
             emp_id=empid,
             firstname=fname,
             lastname=lname,
@@ -160,6 +163,12 @@ def register(request):
             department=dept_object,
             profile_image=f"profile_images/{file_name}" if file_name else None
         )
+
+        if ismanager == 'yes':
+            manager, created = Managers.objects.get_or_create(emp=new_user)
+
+        new_user.managed_by = manager
+        new_user.save()
 
         subject = 'Registration Confirmation'
         message = f'Your account has been successfully registered, {fname} {lname}!'
