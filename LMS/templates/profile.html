@@ -62,7 +62,7 @@
             <div class="form-group row">
                 <label for="employee-manager" class="col-md-3 col-form-label">Manager:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-manager" value="{{ employee.managed_by }}" disabled>
+                    <input type="text" class="form-control" id="employee-manager" value="{{ employee.managed_by.emp.firstname }}" disabled>
                 </div>
             </div>
             <br>
