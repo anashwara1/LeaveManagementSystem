@@ -121,6 +121,9 @@ def profile(request):
 
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
+    mail = request.session.get('logged_user')
+    user = Employees.objects.get(email=mail)
+
 
     if request.method == 'POST':
         empid = request.POST['empid']
@@ -166,6 +169,8 @@ def register(request):
 
         if ismanager == 'yes':
             manager, created = Managers.objects.get_or_create(emp=new_user)
+
+        new_user.managed_by = Managers.objects.get(emp=user.emp_id)
         new_user.save()
 
         subject = 'Registration Confirmation'
