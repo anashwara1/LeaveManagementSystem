@@ -17,6 +17,19 @@ import random
 
 # Create your views here.
 
+def manager_dashboard(request):
+
+    manager = request.user
+
+    # Get all employees managed by the manager
+    employees_managed = Employees.objects.filter(managed_by=manager)
+
+    context = {
+        'employees_managed': employees_managed
+    }
+
+    return render(request, 'emppage.html', context)
+
 
 def logins(request):
     if request.method == 'POST':
