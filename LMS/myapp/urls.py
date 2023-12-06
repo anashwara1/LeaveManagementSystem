@@ -19,5 +19,6 @@ urlpatterns = [
     path('leavehistory/', views.leavehistory, name='leavehistory'),
     path('profile/', views.profile, name='profile'),
     path('change_password/', views.changepassword, name='changepassword'),
+    path('reset_password/', views.resetpassword, name='resetpassword'),
 
 ]
