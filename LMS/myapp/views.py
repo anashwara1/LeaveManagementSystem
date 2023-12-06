@@ -40,10 +40,21 @@ def logins(request):
     return render(request, 'login.html')
 
 
+User = get_user_model()
+
 def forgotpass(request):
     if request.method == 'POST':
         email = request.POST['email']
 
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+
+            messages.error(request, 'This email is not registered. Please enter a registered email address.')
+            return redirect('forgotpassword')
+
+        # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
 
         subject = 'Forgot Password OTP'
@@ -59,7 +70,7 @@ def forgotpass(request):
         request.session['reset_otp'] = otp
         request.session['reset_email'] = email
 
-        messages.success(request, 'Mail is sent. Please check your mail for the otp')
+        messages.success(request, 'Mail is sent. Please check your mail for the OTP')
         return redirect('changepassword')
 
     return render(request, 'forgotpassword.html')
@@ -155,15 +166,7 @@ def register(request):
         )
 
         subject = 'Registration Confirmation'
-        # message = f'Your account has been successfully registered, {fname} {lname}!'
-        message_template = config('MESSAGE_TEMPLATE')
-        fname = f'{fname}'
-        lname = f'{lname}'
-        email = f'{email}'
-        password = f'{password}'
-
-        message_template = message_template.replace('\\n', '\n')
-        message = message_template.format(fname=fname, lname=lname, email=email, password=password)
+        message = f'Your account has been successfully registered, {fname} {lname}!'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
