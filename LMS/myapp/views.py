@@ -166,8 +166,6 @@ def register(request):
 
         if ismanager == 'yes':
             manager, created = Managers.objects.get_or_create(emp=new_user)
-
-        new_user.managed_by = manager
         new_user.save()
 
         subject = 'Registration Confirmation'
