@@ -57,8 +57,12 @@ def forgotpass(request):
         # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
 
-        subject = 'Changing Password'
-        message = f'Change your password using this OTP: {otp}'
+        subject = 'Forgot Password OTP'
+        otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
+        otp=f'{otp}'
+        otp_template = otp_template.replace('\\n', '\n')
+        message = otp_template.format(otp=otp)
+        # message = f'Change your password using this otp : {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
@@ -71,6 +75,7 @@ def forgotpass(request):
         return redirect('changepassword')
 
     return render(request, 'forgotpassword.html')
+
 
 # employee
 def empdashboard(request):
@@ -110,6 +115,33 @@ def leavehistory(request):
         'leave_requests': emp_leaves,
     }
     return render(request, 'leavehistory.html', context)
+
+
+@login_required(login_url='')
+def resetpassword(request):
+    if request.method == 'POST':
+        oldpass = request.POST['oldpassword']
+        newpass = request.POST['newpassword']
+        confirmpass = request.POST['confirmpassword']
+
+        email = request.session.get('logged_user')
+        user = User.objects.get(email=email)
+        print(user.is_superuser)
+
+        if not check_password(oldpass, user.password):
+            messages.error(request, 'The old password entered is wrong')
+        else:
+            if newpass != confirmpass:
+                messages.error(request, 'Passwords entered must be the same')
+            else:
+                user.password = make_password(newpass)
+                user.save()
+                authenticated_user = authenticate(request, email=email, password=newpass)
+                login(request, authenticated_user)
+                request.session['logged_user'] = email
+                messages.success(request, 'Password reset successful')
+                return render(request, 'resetpassword.html')
+    return render(request, 'resetpassword.html', {'messages': messages.get_messages(request)})
 
 
 
