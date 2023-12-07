@@ -57,11 +57,14 @@ def forgotpass(request):
         # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
 
-        subject = 'Changing Password'
-        message = f'Change your password using this OTP: {otp}'
+        subject = 'Forgot Password OTP'
+        otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
+        otp=f'{otp}'
+        otp_template = otp_template.replace('\\n', '\n')
+        message = otp_template.format(otp=otp)
+        # message = f'Change your password using this otp : {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
-
         send_mail(subject, message, from_email, recipient_list)
 
         request.session['reset_otp'] = otp
@@ -71,6 +74,7 @@ def forgotpass(request):
         return redirect('changepassword')
 
     return render(request, 'forgotpassword.html')
+
 
 # employee
 def empdashboard(request):
