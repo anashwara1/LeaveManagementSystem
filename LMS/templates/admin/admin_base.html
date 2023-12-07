@@ -36,6 +36,7 @@
       </div>
     </div>
     <div class="navbar-nav ml-auto">
+      <a class="nav-link {% if request.path == '/reset_password/' %}active{% endif %}" href="{% url 'resetpassword' %}">Reset Password</a>
       <a class="nav-link {% if request.path == '/profile/' %}active{% endif %}" href="{% url 'profile' %}">Profile</a>
       <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="{% url 'login' %}">Logout</a>
     </div>

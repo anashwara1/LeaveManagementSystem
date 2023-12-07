@@ -1,6 +1,6 @@
 from decouple import config
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -114,6 +114,35 @@ def leavehistory(request):
         'leave_requests': emp_leaves,
     }
     return render(request, 'leavehistory.html', context)
+
+
+@login_required(login_url='')
+def resetpassword(request):
+    if request.method == 'POST':
+        oldpass = request.POST['oldpassword']
+        newpass = request.POST['newpassword']
+        confirmpass = request.POST['confirmpassword']
+
+        email = request.session.get('logged_user')
+        user = User.objects.get(email=email)
+        print(user.is_superuser)
+
+        if not check_password(oldpass, user.password):
+            messages.error(request, 'The old password entered is wrong')
+        else:
+            if newpass != confirmpass:
+                messages.error(request, 'Passwords entered must be the same')
+            else:
+                user.password = make_password(newpass)
+                user.save()
+                authenticated_user = authenticate(request, email=email, password=newpass)
+                login(request, authenticated_user)
+                request.session['logged_user'] = email
+                messages.success(request, 'Password reset successful')
+                return render(request, 'resetpassword.html')
+    return render(request, 'resetpassword.html', {'messages': messages.get_messages(request)})
+
+
 
 def profile(request):
     return render(request, 'profile.html')
