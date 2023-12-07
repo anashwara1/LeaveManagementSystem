@@ -81,6 +81,9 @@ def forgotpass(request):
 def empdashboard(request):
     return render(request, 'employee/dashboard.html')
 
+def landingPage(request):
+    return render(request,'landingPage.html')
+
 
 # common
 def applyleave(request):
