@@ -46,7 +46,12 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Super user must have is_staff true')
 
-        return self.create_user(email, password, **extra_fields)
+        user = self.create_user(email, password, **extra_fields)
+
+        manager = Managers(emp=user)
+        manager.save()
+
+        return user
 
 
 class Employees(AbstractUser, PermissionsMixin):
