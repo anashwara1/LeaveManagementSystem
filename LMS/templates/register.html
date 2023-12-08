@@ -7,7 +7,7 @@
 {% block content %}
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% endif %}">
             {{ message }}
         </div>
     {% endfor %}
@@ -77,6 +77,17 @@
                     <input type="date" class="form-control" id="employee-doj" name="doj" required>
                 </div>
             </div>
+            <br>
+            <div class="form-group row">
+                        <label for="manager" class="col-md-3 col-form-label bold-label">Manager:</label>
+                        <div class="col-md-9">
+                            <select id="manager" name="manager" onchange="showInput()">
+                                {% for manager in managers %}
+                                    <option value="{{ manager }}">{{ manager }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
             <br>
             <div class="form-group row">
                 <label for="is-manager" class="col-md-3 col-form-label bold-label">Is Manager</label>
