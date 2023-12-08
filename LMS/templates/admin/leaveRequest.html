@@ -1,11 +1,13 @@
 
 {% extends 'admin/admin_base.html' %}
-
+{% load static %}
 {% block title %}Leave Request{% endblock %}
-
 {% block content %}
+
 <div class="card">
   <h2>Leave Requests</h2>
+
+
   <table id="details">
     <thead>
       <tr>
@@ -18,13 +20,140 @@
         <th>Actions</th>
       </tr>
     </thead>
+    <tbody>
+            {% for leave in leaves %}
+            <tr data-reason="{{ leave.reason }}" data-balance="{{ leave.emp.balance }}" data-emp="{{ leave.leave_request_id }}">
+                <td>{{ leave.emp.firstname }} {{ leave.emp.lastname }}</td>
+                <td>{{ leave.leavetypeid.leave_type_name }}</td>
+                <td>{{ leave.startdate }}</td>
+                <td>{{ leave.enddate }}</td>
+                <td>{{ leave.duration }}</td>
+                <td>{{ leave.status }}</td>
+                <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Leavedetails">View</button>
+                </td>
 
-  </table>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="Leavedetails" tabindex="-1" aria-labelledby="LeavedetailsLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="container-fluid h-100">
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-4 text-center">
+             {% if profile_image %}
+             <img src="{{ profile_image.url }}" alt="{{ employee.firstname }}'s Profile Image" class="img-fluid rounded-circle" >
+             {% else %}
+             <img src="{% static 'no_profile_img/no.jpg' %}" alt="Default Profile Image" class="img-fluid rounded-circle" >
+             {% endif %}
+        </div>
+  </div>
+    <div class="card-body">
+<div class="container">
+                <form method="POST" action="{% url 'leaveRequest' %}">
+                    {% csrf_token %}
+            <input type="hidden" name="empid" id="empid">
+            <div class="form-group row">
+                <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-name" disabled>
+                </div>
+            </div>
+            <br>
+
+
+            <div class="form-group row">
+                <label for="leave-type" class="col-md-3 col-form-label">Leave Type:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-type"  disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="reason" class="col-md-3 col-form-label">Reason:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="Reason" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="start-date" class="col-md-3 col-form-label">Start Date:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="start-date" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="end-date" class="col-md-3 col-form-label">End Date:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="end-date" disabled>
+                </div>
+            </div>
+            <br>
+           <div class="form-group row">
+                <label for="days" class="col-md-3 col-form-label">No of Days:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="days" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="leave-balance" class="col-md-3 col-form-label">Leave Balance:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-balance" disabled>
+                </div>
+            </div>
+                    <br>
+                    <button type="submit" class="btn btn-success" name="action" value="accept">Accept</button>
+                    <button type="submit" class="btn btn-danger" name="action" value="reject">Reject</button>
+
+        </form>
 </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script>
-        $(document).ready(function() {
-            $('#details').DataTable();
+    $(document).ready(function () {
+        var table = $('#details').DataTable();
+
+        $('.btn-primary').on('click', function () {
+            var row = $(this).closest('tr');
+            var columns = row.find('td');
+            var reason = row.data('reason');
+            var balance = row.data('balance');
+            var emp = row.data('emp')
+
+            // Assuming the order of columns in the DataTable matches this order
+            var employeeName = $(columns[0]).text().trim();
+            var leaveType = $(columns[1]).text().trim();
+            var startDate = $(columns[2]).text().trim();
+            var endDate = $(columns[3]).text().trim();
+            var days = $(columns[4]).text().trim();
+            var status = $(columns[5]).text().trim();
+
+
+            // Populate modal form fields
+            $('#employee-name').val(employeeName);
+            $('#leave-type').val(leaveType);
+            $('#start-date').val(startDate);
+            $('#end-date').val(endDate);
+            $('#Reason').val(reason);
+            $('#days').val(days);
+            $('#leave-balance').val(balance);
+            $('#selected-employee').val(emp);
+            $('#empid').val(emp);
+
+            // Show the modal
+            $('#Leavedetails').modal('show');
         });
-    </script>
+    });
+</script>
+
+
 
 {% endblock %}

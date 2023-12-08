@@ -65,6 +65,7 @@ class Employees(AbstractUser, PermissionsMixin):
     created_at = models.DateTimeField(db_column='Created_at', blank=True, null=True)  # Field name made lowercase.
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
 
     objects = CustomUserManager()
 
