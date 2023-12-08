@@ -227,8 +227,29 @@ def dashboard(request):
 
 
 def leaveRequest(request):
-    return render(request, 'admin/leaveRequest.html')
+    mail = request.session.get('logged_user')
+    user = Employees.objects.get(email=mail)
+    manager = Managers.objects.get(emp=user.emp_id)
+    emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+    leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+    for leave in leaves:
+        leave.duration = (leave.enddate - leave.startdate).days
+    context = {
+        'leaves': leaves
+    }
+    if request.method == 'POST':
+        action = request.POST['action']
+        leaveid = request.POST['empid']
+        updated_leave = LeaveRequest.objects.get(leave_request_id=leaveid)
+        if action == 'accept':
+            updated_leave.status = 'Accepted'
 
+        else:
+            updated_leave.status = 'Rejected'
+        updated_leave.save()
+        return redirect('leaveRequest')
+
+    return render(request, 'admin/leaveRequest.html', context)
 
 def emppage(request):
     return render(request, 'emppage.html')
