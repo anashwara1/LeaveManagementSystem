@@ -23,7 +23,6 @@ def logins(request):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
-        request.session['logged_user'] = email
         if user is not None:
             if user.is_superuser:
                 login(request, user)
@@ -94,8 +93,7 @@ def applyleave(request):
         reason = request.POST['reason']
 
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
-        emp_mail = request.session.get('logged_user')
-        emp = Employees.objects.get(email=emp_mail)
+        emp = Employees.objects.get(email=request.user.email)
         new_leave = LeaveRequest(
             startdate=startdate,
             enddate=enddate,
@@ -111,8 +109,7 @@ def applyleave(request):
 
 
 def leavehistory(request):
-    mail = request.session.get('logged_user')
-    user = Employees.objects.get(email=mail)
+    user = Employees.objects.get(email=request.user.email)
     emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
     context = {
         'leave_requests': emp_leaves,
@@ -127,9 +124,7 @@ def resetpassword(request):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        email = request.session.get('logged_user')
-        user = User.objects.get(email=email)
-        print(user.is_superuser)
+        user = User.objects.get(email=request.user.email)
 
         if not check_password(oldpass, user.password):
             messages.error(request, 'The old password entered is wrong')
@@ -139,9 +134,8 @@ def resetpassword(request):
             else:
                 user.password = make_password(newpass)
                 user.save()
-                authenticated_user = authenticate(request, email=email, password=newpass)
+                authenticated_user = authenticate(request, email=request.user.email, password=newpass)
                 login(request, authenticated_user)
-                request.session['logged_user'] = email
                 messages.success(request, 'Password reset successful')
                 return render(request, 'resetpassword.html')
     return render(request, 'resetpassword.html', {'messages': messages.get_messages(request)})
@@ -156,8 +150,7 @@ def profile(request):
 
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
-    mail = request.session.get('logged_user')
-    user = Employees.objects.get(email=mail)
+    user = Employees.objects.get(email=request.user.email)
 
 
     if request.method == 'POST':
@@ -227,8 +220,7 @@ def dashboard(request):
 
 
 def leaveRequest(request):
-    mail = request.session.get('logged_user')
-    user = Employees.objects.get(email=mail)
+    user = Employees.objects.get(email=request.user.email)
     manager = Managers.objects.get(emp=user.emp_id)
     emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
     leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
