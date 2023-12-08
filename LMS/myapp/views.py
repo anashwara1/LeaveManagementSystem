@@ -65,6 +65,7 @@ def forgotpass(request):
         # message = f'Change your password using this otp : {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
+
         send_mail(subject, message, from_email, recipient_list)
 
         request.session['reset_otp'] = otp
@@ -79,6 +80,9 @@ def forgotpass(request):
 # employee
 def empdashboard(request):
     return render(request, 'employee/dashboard.html')
+
+def landingPage(request):
+    return render(request,'landingPage.html')
 
 
 # common
@@ -152,6 +156,9 @@ def profile(request):
 
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
+    mail = request.session.get('logged_user')
+    user = Employees.objects.get(email=mail)
+
 
     if request.method == 'POST':
         empid = request.POST['empid']
@@ -162,6 +169,7 @@ def register(request):
         desig = request.POST['desig']
         dept = request.POST['dept']
         password = request.POST['password']
+        ismanager = request.POST['ismanager']
 
         # Process the file upload
         employee_image = request.FILES.get('employee_image', None)
@@ -183,7 +191,7 @@ def register(request):
 
         desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
-        new_user = get_user_model().objects.create_user(
+        new_user = Employees.objects.create_user(
             emp_id=empid,
             firstname=fname,
             lastname=lname,
@@ -193,6 +201,12 @@ def register(request):
             department=dept_object,
             profile_image=f"profile_images/{file_name}" if file_name else None
         )
+
+        if ismanager == 'yes':
+            manager, created = Managers.objects.get_or_create(emp=new_user)
+
+        new_user.managed_by = Managers.objects.get(emp=user.emp_id)
+        new_user.save()
 
         subject = 'Registration Confirmation'
         message = f'Your account has been successfully registered, {fname} {lname}!'

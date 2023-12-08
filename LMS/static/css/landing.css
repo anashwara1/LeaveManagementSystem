@@ -1,0 +1,202 @@
+
+{% load static %}
+/* Resetting default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Setting default font family */
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Styling the main container */
+main {
+  position: relative;
+  width: calc(min(90rem, 90%));
+  margin: 0 auto;
+  min-height: 100vh;
+  column-gap: 3rem;
+  padding-block: min(20vh, 3rem);
+}
+
+/* Background images with opacity */
+
+
+.bg {
+  position: fixed;
+  z-index: -1;
+  opacity: 100%;
+  top: 0;
+  bottom:10rem;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+/* Styles for the heading section */
+main > div span {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 1rem;
+  color: #717171;
+}
+
+main > div h1 {
+  text-transform: capitalize;
+  letter-spacing: 0.8px;
+  font-family: Roboto, sans-serif;
+  font-weight: 900;
+  font-size: clamp(3.4375rem, 3.25rem + 0.75vw, 4rem);
+  /* Gradient text effect */
+  background: linear-gradient(45deg, #005baa, #000000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
+main > div hr {
+  display: block;
+  background: #005baa;
+  height: 0.25rem;
+  width: 6.25rem;
+  border: none;
+  margin: 1.125rem 0 1.875rem 0;
+}
+
+main > div p {
+  line-height: 1.6;
+}
+
+/* Styles for links */
+main a {
+  display: inline-block;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #717171;
+  font-weight: 500;
+  background: #fff;
+  border-radius: 3.125rem;
+  transition: 0.3s ease-in-out;
+}
+
+main > div > a {
+  border: 2px solid #c2c2c2;
+  margin-top: 2.188rem;
+  padding: 0.625rem 1.875rem;
+  background-color :rgb(9, 118, 172);
+  color: #fff
+}
+
+main > div > a:hover {
+  border: 0.125rem solid #005baa;
+  color: #005baa;
+}
+
+/* Styles for the Swiper container */
+.swiper {
+  width: 100%;
+  padding-top: 3.125rem;
+  border-radius : 2rem;
+}
+
+/* Pagination styles */
+.swiper-pagination-bullet,
+.swiper-pagination-bullet-active {
+  background: #fff;
+}
+
+.swiper-pagination {
+  bottom: 1.25rem !important;
+}
+
+/* Styles for individual slides */
+.swiper-slide {
+  width: 18.75rem;
+  height: calc(15rem * 16 / 9)!important;
+  border-radius:2rem;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: self-start;
+}
+
+.swiper-slide h2 {
+  color: #fff;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin-bottom: 0.625rem;
+  padding: 0 0 0 1.563rem;
+  text-transform: uppercase;
+}
+
+.swiper-slide div {
+  padding-bottom: 0.625rem;
+}
+
+.swiper-slide p {
+  color: #dadada;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  padding: 0 1.563rem;
+  line-height: 1.6;
+  font-size: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.swiper-slide a {
+  display:none
+}
+
+.swiper-slide a:hover {
+  color: #005baa;
+}
+
+/* Styles for background images of individual slides */
+
+
+.swiper-slide--two {
+  background: linear-gradient(to top, #0f2027, #203a4300, #2c536400), url("../landingPageImg/img1.jpg") no-repeat 50% 50% / cover;
+}
+
+.swiper-slide--three {
+  background: linear-gradient(to top, #0f2027, #203a4300, #2c536400), url("../landingPageImg/img2.jpg") no-repeat 50% 50% / cover;
+}
+
+.swiper-slide--four {
+  background: linear-gradient(to top, #0f2027, #203a4300, #2c536400), url("../landingPageImg/img3.jpg") no-repeat 50% 50% / cover;
+}
+
+.swiper-slide--five {
+  background: linear-gradient(to top, #0f2027, #203a4300, #2c536400), url("../landingPageImg/img4.jpg") no-repeat 50% 50% / cover;
+}
+
+/* Additional styles for larger screens */
+@media screen and (min-width: 48rem) {
+  main {
+    display: flex;
+    align-items: center;
+  }
+  .bg, .bg2 {
+    opacity: 0.1;
+  }
+}
+
+@media screen and (min-width: 48rem) {
+  .swiper-slide {
+    height: calc(50rem * 16 / 9); /* Adjust for larger screens */
+  }
+}
+
+
