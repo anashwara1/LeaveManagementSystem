@@ -23,11 +23,10 @@ def logins(request):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
-        managers = Managers.objects.all()
+        # managers = Managers.objects.all()
         if user is not None:
-            is_manager = any(user.emp_id == manager.emp.emp_id for manager in managers)
-
-            if is_manager:
+            # is_manager = any(user.emp_id == manager.emp.emp_id for manager in managers)
+            if user.is_manager:
                 login(request, user)
                 return redirect('dashboard')
             else:
@@ -216,6 +215,7 @@ def register(request):
 
                 if ismanager == 'yes':
                     newmanager, created = Managers.objects.get_or_create(emp=new_user)
+                    new_user.is_manager = 'True'
 
                 managerid = Employees.objects.get(firstname=manager)
 
@@ -246,7 +246,7 @@ def leaveRequest(request):
     emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
     leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
     for leave in leaves:
-        leave.duration = (leave.enddate - leave.startdate).days
+        leave.duration = (leave.enddate - leave.startdate).days+1
     context = {
         'leaves': leaves
     }
