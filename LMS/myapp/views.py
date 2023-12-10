@@ -2,11 +2,13 @@ from decouple import config
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.template.loader import get_template
 
+from django.http import JsonResponse, HttpResponseRedirect
+from django.urls import reverse
 from .models import Department, Designation
 from django.contrib.auth.models import User
 from .models import Employees, Department, Designation, Leavebalance, LeaveTypes, LeaveRequest, Managers
@@ -14,8 +16,36 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 import random
 
+def get_leave(request, leave_id):
+    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+    data = {
+        'leavetypeid': leave.leavetypeid_id,
+        'startdate': leave.startdate,
+        'enddate': leave.enddate,
+        'reason': leave.reason,
+        # Add other fields as needed
+    }
+    return JsonResponse(data)
 
+def edit_leave(request, leave_id):
+    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+
+    # Update leave details based on the POST data
+    leave.leavetypeid_id = request.POST.get('leavetype')
+    leave.startdate = request.POST.get('startdate')
+    leave.enddate = request.POST.get('enddate')
+    leave.reason = request.POST.get('reason')
+    # Update other fields as needed
+    leave.save()
+
+    return redirect('leavehistory')
 # Create your views here.
+def delete_leave(request, leave_id):
+    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+    leave.delete()
+
+    # messages.success(request, 'Leave request deleted successfully')
+    return redirect('leavehistory')
 
 
 def logins(request):
