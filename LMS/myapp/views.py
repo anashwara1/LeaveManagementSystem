@@ -124,8 +124,7 @@ def applyleave(request):
         reason = request.POST['reason']
 
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
-        emp_mail = request.session.get('logged_user')
-        emp = Employees.objects.get(email=emp_mail)
+        emp = Employees.objects.get(email=request.user.email)
         new_leave = LeaveRequest(
             startdate=startdate,
             enddate=enddate,
@@ -141,8 +140,7 @@ def applyleave(request):
 
 
 def leavehistory(request):
-    mail = request.session.get('logged_user')
-    user = Employees.objects.get(email=mail)
+    user = Employees.objects.get(email=request.user.email)
     emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
     context = {
         'leave_requests': emp_leaves,
@@ -157,9 +155,7 @@ def resetpassword(request):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        email = request.session.get('logged_user')
-        user = User.objects.get(email=email)
-        print(user.is_superuser)
+        user = User.objects.get(email=request.user.email)
 
         if not check_password(oldpass, user.password):
             messages.error(request, 'The old password entered is wrong')
@@ -169,9 +165,8 @@ def resetpassword(request):
             else:
                 user.password = make_password(newpass)
                 user.save()
-                authenticated_user = authenticate(request, email=email, password=newpass)
+                authenticated_user = authenticate(request, email=request.user.email, password=newpass)
                 login(request, authenticated_user)
-                request.session['logged_user'] = email
                 messages.success(request, 'Password reset successful')
                 return render(request, 'resetpassword.html')
     return render(request, 'resetpassword.html', {'messages': messages.get_messages(request)})
@@ -186,9 +181,13 @@ def profile(request):
 
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
-    mail = request.session.get('logged_user')
-    user = Employees.objects.get(email=mail)
-
+    managers_id = Managers.objects.values_list('emp', flat=True).distinct()
+    managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
+    user = Employees.objects.get(email=request.user.email)
+    context = {
+        'departments': departments,
+        'managers': managers
+    }
 
     if request.method == 'POST':
         empid = request.POST['empid']
@@ -200,56 +199,64 @@ def register(request):
         dept = request.POST['dept']
         password = request.POST['password']
         ismanager = request.POST['ismanager']
+        manager = request.POST['manager']
 
         # Process the file upload
         employee_image = request.FILES.get('employee_image', None)
 
-        # Save the uploaded image
-        if employee_image:
-            file_name = f"{empid}_{employee_image.name}"
-            with open(f"media/profile_images/{file_name}", 'wb') as destination:
-                for chunk in employee_image.chunks():
-                    destination.write(chunk)
+        existing_employees = Employees.objects.filter(email=email)
+
+        if existing_employees.exists():
+            messages.error(request, 'Entered email is already registered')
         else:
-            file_name = None
+            # Save the uploaded image
+            if employee_image:
+                file_name = f"{empid}_{employee_image.name}"
+                with open(f"media/profile_images/{file_name}", 'wb') as destination:
+                    for chunk in employee_image.chunks():
+                        destination.write(chunk)
+            else:
+                file_name = None
 
-        if dept == 'Other':
-            other_dept = request.POST['other-dept']
-            dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
-        else:
-            dept_object, created = Department.objects.get_or_create(dep_name=dept)
+            if dept == 'Other':
+                other_dept = request.POST['other-dept']
+                dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
+            else:
+                dept_object, created = Department.objects.get_or_create(dep_name=dept)
 
-        desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+            desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
-        new_user = Employees.objects.create_user(
-            emp_id=empid,
-            firstname=fname,
-            lastname=lname,
-            email=email,
-            password=password,
-            date_of_joining=doj,
-            department=dept_object,
-            profile_image=f"profile_images/{file_name}" if file_name else None
-        )
+            new_user = Employees.objects.create_user(
+                emp_id=empid,
+                firstname=fname,
+                lastname=lname,
+                email=email,
+                password=password,
+                date_of_joining=doj,
+                department=dept_object,
+                profile_image=f"profile_images/{file_name}" if file_name else None
+            )
 
-        if ismanager == 'yes':
-            manager, created = Managers.objects.get_or_create(emp=new_user)
+            if ismanager == 'yes':
+                manager, created = Managers.objects.get_or_create(emp=new_user)
 
-        new_user.managed_by = Managers.objects.get(emp=user.emp_id)
-        new_user.save()
+            managerid = Employees.objects.get(firstname=manager)
 
-        subject = 'Registration Confirmation'
-        message = f'Your account has been successfully registered, {fname} {lname}!'
-        from_email = config('EMAIL_HOST_USER')
-        recipient_list = [email]
+            new_user.managed_by = Managers.objects.get(emp=managerid.emp_id)
+            new_user.save()
 
-        send_mail(subject, message, from_email, recipient_list)
+            subject = 'Registration Confirmation'
+            message = f'Your account has been successfully registered, {fname} {lname}!'
+            from_email = config('EMAIL_HOST_USER')
+            recipient_list = [email]
 
-        messages.success(request, 'Employee registered successfully, and an email is sent.')
+            send_mail(subject, message, from_email, recipient_list)
 
-       # return redirect('login')  # Redirect to login page after successful registration
+            messages.success(request, 'Employee registered successfully')
 
-    return render(request, 'register.html', {'departments': departments})
+           # return redirect('login')  # Redirect to login page after successful registration
+
+    return render(request, 'register.html', context)
 
 
 def dashboard(request):
@@ -257,8 +264,28 @@ def dashboard(request):
 
 
 def leaveRequest(request):
-    return render(request, 'admin/leaveRequest.html')
+    user = Employees.objects.get(email=request.user.email)
+    manager = Managers.objects.get(emp=user.emp_id)
+    emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+    leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+    for leave in leaves:
+        leave.duration = (leave.enddate - leave.startdate).days
+    context = {
+        'leaves': leaves
+    }
+    if request.method == 'POST':
+        action = request.POST['action']
+        leaveid = request.POST['empid']
+        updated_leave = LeaveRequest.objects.get(leave_request_id=leaveid)
+        if action == 'accept':
+            updated_leave.status = 'Accepted'
 
+        else:
+            updated_leave.status = 'Rejected'
+        updated_leave.save()
+        return redirect('leaveRequest')
+
+    return render(request, 'admin/leaveRequest.html', context)
 
 def emppage(request):
     return render(request, 'emppage.html')
