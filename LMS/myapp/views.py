@@ -284,8 +284,9 @@ def leaveRequest(request):
     leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
     for leave in leaves:
         leave.duration = (leave.enddate - leave.startdate).days+1
+    pending_leaves = [leave for leave in leaves if leave.status == "Pending"]
     context = {
-        'leaves': leaves
+        'leaves': pending_leaves
     }
     if request.method == 'POST':
         action = request.POST['action']
@@ -297,6 +298,14 @@ def leaveRequest(request):
         else:
             updated_leave.status = 'Rejected'
         updated_leave.save()
+
+        email = Employees.objects.get(email=updated_leave.emp.email)
+        subject = f'LEAVE REQUEST {action.upper()}ED'
+        message = f'The leave request you have sent has been {action}ed'
+        from_email = config('EMAIL_HOST_USER')
+        recipient_list = [email]
+
+        send_mail(subject, message, from_email, recipient_list)
         return redirect('leaveRequest')
 
     return render(request, 'admin/leaveRequest.html', context)
