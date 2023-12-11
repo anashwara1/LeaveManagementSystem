@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.template.loader import get_template
+from django.contrib.auth import logout
 
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -53,9 +53,10 @@ def logins(request):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
-        request.session['logged_user'] = email
+        # managers = Managers.objects.all()
         if user is not None:
-            if user.is_superuser:
+            # is_manager = any(user.emp_id == manager.emp.emp_id for manager in managers)
+            if user.is_manager:
                 login(request, user)
                 return redirect('dashboard')
             else:
@@ -107,7 +108,7 @@ def forgotpass(request):
     return render(request, 'forgotpassword.html')
 
 
-# employee
+@login_required(login_url='/login')
 def empdashboard(request):
     return render(request, 'employee/dashboard.html')
 
@@ -116,6 +117,7 @@ def landingPage(request):
 
 
 # common
+@login_required(login_url='/login')
 def applyleave(request):
     if request.method == 'POST':
         leavetype = request.POST['leavetype']
@@ -139,6 +141,7 @@ def applyleave(request):
     return render(request, 'applyleave.html')
 
 
+@login_required(login_url='/login')
 def leavehistory(request):
     user = Employees.objects.get(email=request.user.email)
     emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
@@ -148,7 +151,8 @@ def leavehistory(request):
     return render(request, 'leavehistory.html', context)
 
 
-@login_required(login_url='')
+
+@login_required(login_url='/login')
 def resetpassword(request):
     if request.method == 'POST':
         oldpass = request.POST['oldpassword']
@@ -173,12 +177,14 @@ def resetpassword(request):
 
 
 
+@login_required(login_url='/login')
 def profile(request):
     return render(request, 'profile.html')
 
 
 # admin
 
+@login_required(login_url='/login')
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
     managers_id = Managers.objects.values_list('emp', flat=True).distinct()
@@ -190,6 +196,7 @@ def register(request):
     }
 
     if request.method == 'POST':
+
         empid = request.POST['empid']
         fname = request.POST['fname']
         lname = request.POST['lname']
@@ -201,75 +208,82 @@ def register(request):
         ismanager = request.POST['ismanager']
         manager = request.POST['manager']
 
-        # Process the file upload
-        employee_image = request.FILES.get('employee_image', None)
+        if len(empid) >= 10:
+            messages.error(request, 'Entered employee ID is too long')
 
-        existing_employees = Employees.objects.filter(email=email)
-
-        if existing_employees.exists():
-            messages.error(request, 'Entered email is already registered')
         else:
-            # Save the uploaded image
-            if employee_image:
-                file_name = f"{empid}_{employee_image.name}"
-                with open(f"media/profile_images/{file_name}", 'wb') as destination:
-                    for chunk in employee_image.chunks():
-                        destination.write(chunk)
+        # Process the file upload
+            employee_image = request.FILES.get('employee_image', None)
+
+            existing_employees = Employees.objects.filter(email=email)
+
+            if existing_employees.exists():
+                messages.error(request, 'Entered email is already registered')
             else:
-                file_name = None
+                # Save the uploaded image
+                if employee_image:
+                    file_name = f"{empid}_{employee_image.name}"
+                    with open(f"media/profile_images/{file_name}", 'wb') as destination:
+                        for chunk in employee_image.chunks():
+                            destination.write(chunk)
+                else:
+                    file_name = None
 
-            if dept == 'Other':
-                other_dept = request.POST['other-dept']
-                dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
-            else:
-                dept_object, created = Department.objects.get_or_create(dep_name=dept)
+                if dept == 'Other':
+                    other_dept = request.POST['other-dept']
+                    dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
+                else:
+                    dept_object, created = Department.objects.get_or_create(dep_name=dept)
 
-            desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+                desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
 
-            new_user = Employees.objects.create_user(
-                emp_id=empid,
-                firstname=fname,
-                lastname=lname,
-                email=email,
-                password=password,
-                date_of_joining=doj,
-                department=dept_object,
-                profile_image=f"profile_images/{file_name}" if file_name else None
-            )
+                new_user = Employees.objects.create_user(
+                    emp_id=empid,
+                    firstname=fname,
+                    lastname=lname,
+                    email=email,
+                    password=password,
+                    date_of_joining=doj,
+                    department=dept_object,
+                    profile_image=f"profile_images/{file_name}" if file_name else None
+                )
 
-            if ismanager == 'yes':
-                manager, created = Managers.objects.get_or_create(emp=new_user)
+                if ismanager == 'yes':
+                    newmanager, created = Managers.objects.get_or_create(emp=new_user)
+                    new_user.is_manager = 'True'
 
-            managerid = Employees.objects.get(firstname=manager)
+                managerid = Employees.objects.get(firstname=manager)
 
-            new_user.managed_by = Managers.objects.get(emp=managerid.emp_id)
-            new_user.save()
+                new_user.managed_by = Managers.objects.get(emp=managerid.emp_id)
+                new_user.save()
 
-            subject = 'Registration Confirmation'
-            message = f'Your account has been successfully registered, {fname} {lname}!'
-            from_email = config('EMAIL_HOST_USER')
-            recipient_list = [email]
+                subject = 'Registration Confirmation'
+                message = f'Your account has been successfully registered, {fname} {lname}!'
+                from_email = config('EMAIL_HOST_USER')
+                recipient_list = [email]
 
-            send_mail(subject, message, from_email, recipient_list)
+                send_mail(subject, message, from_email, recipient_list)
 
-            messages.success(request, 'Employee registered successfully')
+                messages.success(request, 'Employee registered successfully')
 
-           # return redirect('login')  # Redirect to login page after successful registration
+               # return redirect('login')  # Redirect to login page after successful registration
 
     return render(request, 'register.html', context)
 
 
+@login_required(login_url='/login')
 def dashboard(request):
     return render(request, 'admin/dashboard.html')
 
 
+@login_required(login_url='/login')
 def leaveRequest(request):
     user = Employees.objects.get(email=request.user.email)
     manager = Managers.objects.get(emp=user.emp_id)
     emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
     leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
     for leave in leaves:
-        leave.duration = (leave.enddate - leave.startdate).days
+        leave.duration = (leave.enddate - leave.startdate).days+1
     context = {
         'leaves': leaves
     }
@@ -287,8 +301,11 @@ def leaveRequest(request):
 
     return render(request, 'admin/leaveRequest.html', context)
 
+
+@login_required(login_url='/login')
 def emppage(request):
     return render(request, 'emppage.html')
+
 
 
 def changepassword(request):
@@ -319,7 +336,7 @@ def changepassword(request):
 # retrieving data from database to profile
 
 
-@login_required
+@login_required(login_url='/login')
 def profile(request):
     try:
         employee = Employees.objects.get(email=request.user.email)
@@ -347,3 +364,8 @@ def profile(request):
 
     except Employees.DoesNotExist:
             return render(request, 'profile.html', {'error': 'Employee not found'})
+
+
+def logout_view(request):
+    logout(request)
+    return render(request, 'landingPage.html')
