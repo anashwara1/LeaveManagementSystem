@@ -284,9 +284,8 @@ def leaveRequest(request):
     leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
     for leave in leaves:
         leave.duration = (leave.enddate - leave.startdate).days+1
-    pending_leaves = [leave for leave in leaves if leave.status == "Pending"]
     context = {
-        'leaves': pending_leaves
+        'leaves': leaves
     }
     if request.method == 'POST':
         action = request.POST['action']
@@ -349,12 +348,13 @@ def changepassword(request):
 def profile(request):
     try:
         employee = Employees.objects.get(email=request.user.email)
-
+        # desig = Designation.objects.filter(dep=employee.department)
         emp_id = employee.emp_id
         firstname = employee.firstname
         lastname = employee.lastname
         department = employee.department
         profile_image = employee.profile_image
+        # designation = desig
 
         try:
              leave_balance = Leavebalance.objects.get(empid=employee)
@@ -369,6 +369,7 @@ def profile(request):
                 'profile_image': profile_image,
                 'department': department,
                 'leave_balance': leave_balance,
+                # 'designation': designation
             })
 
     except Employees.DoesNotExist:
