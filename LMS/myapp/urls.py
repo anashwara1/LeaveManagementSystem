@@ -22,5 +22,8 @@ urlpatterns = [
     path('change_password/', views.changepassword, name='changepassword'),
     path('reset_password/', views.resetpassword, name='resetpassword'),
     path('logout/', views.logout_view, name='logout'),
+    path('get_leave/<int:leave_id>/', views.get_leave, name='get_leave'),
+    path('edit_leave/<int:leave_id>/',views.edit_leave, name='edit_leave'),
+    path('delete_leave/<int:leave_id>/', views.delete_leave, name='delete_leave'),
 
 ]
