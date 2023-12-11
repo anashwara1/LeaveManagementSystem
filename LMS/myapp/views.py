@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.template.loader import get_template
+from django.contrib.auth import logout
 
 from .models import Department, Designation
 from django.contrib.auth.models import User
@@ -78,7 +78,7 @@ def forgotpass(request):
     return render(request, 'forgotpassword.html')
 
 
-# employee
+@login_required(login_url='/login')
 def empdashboard(request):
     return render(request, 'employee/dashboard.html')
 
@@ -87,6 +87,7 @@ def landingPage(request):
 
 
 # common
+@login_required(login_url='/login')
 def applyleave(request):
     if request.method == 'POST':
         leavetype = request.POST['leavetype']
@@ -110,6 +111,7 @@ def applyleave(request):
     return render(request, 'applyleave.html')
 
 
+@login_required(login_url='/login')
 def leavehistory(request):
     user = Employees.objects.get(email=request.user.email)
     emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
@@ -119,7 +121,8 @@ def leavehistory(request):
     return render(request, 'leavehistory.html', context)
 
 
-@login_required(login_url='')
+
+@login_required(login_url='/login')
 def resetpassword(request):
     if request.method == 'POST':
         oldpass = request.POST['oldpassword']
@@ -144,12 +147,14 @@ def resetpassword(request):
 
 
 
+@login_required(login_url='/login')
 def profile(request):
     return render(request, 'profile.html')
 
 
 # admin
 
+@login_required(login_url='/login')
 def register(request):
     departments = Department.objects.values_list('dep_name', flat=True).distinct()
     managers_id = Managers.objects.values_list('emp', flat=True).distinct()
@@ -236,10 +241,12 @@ def register(request):
     return render(request, 'register.html', context)
 
 
+@login_required(login_url='/login')
 def dashboard(request):
     return render(request, 'admin/dashboard.html')
 
 
+@login_required(login_url='/login')
 def leaveRequest(request):
     user = Employees.objects.get(email=request.user.email)
     manager = Managers.objects.get(emp=user.emp_id)
@@ -264,8 +271,11 @@ def leaveRequest(request):
 
     return render(request, 'admin/leaveRequest.html', context)
 
+
+@login_required(login_url='/login')
 def emppage(request):
     return render(request, 'emppage.html')
+
 
 
 def changepassword(request):
@@ -296,7 +306,7 @@ def changepassword(request):
 # retrieving data from database to profile
 
 
-@login_required
+@login_required(login_url='/login')
 def profile(request):
     try:
         employee = Employees.objects.get(email=request.user.email)
@@ -324,3 +334,8 @@ def profile(request):
 
     except Employees.DoesNotExist:
             return render(request, 'profile.html', {'error': 'Employee not found'})
+
+
+def logout_view(request):
+    logout(request)
+    return render(request, 'landingPage.html')
