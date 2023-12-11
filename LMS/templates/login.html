@@ -19,6 +19,8 @@
             <button>Sign In</button><br>
         </div>
     </form>
+ <a href="{% url 'landingPage' %}"><button class="back-button">Back to Home</button></a>
+
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
