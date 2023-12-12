@@ -7,7 +7,7 @@
 {% block content %}
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% endif %}">
             {{ message }}
         </div>
     {% endfor %}
@@ -75,6 +75,31 @@
                 <label for="employee-doj" class="col-md-3 col-form-label bold-label">Date of Joining:</label>
                 <div class="col-md-9">
                     <input type="date" class="form-control" id="employee-doj" name="doj" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                        <label for="manager" class="col-md-3 col-form-label bold-label">Manager:</label>
+                        <div class="col-md-9">
+                            <select id="manager" name="manager" onchange="showInput()">
+                                {% for manager in managers %}
+                                    <option value="{{ manager }}">{{ manager }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+            <br>
+            <div class="form-group row">
+                <label for="is-manager" class="col-md-3 col-form-label bold-label">Is Manager</label>
+                <div class="col-md-9">
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="is-manager-yes" name="ismanager" value="yes" required>
+                        <label class="form-check-label" for="is-manager-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="is-manager-no" name="ismanager" value="no" required>
+                        <label class="form-check-label" for="is-manager-no">No</label>
+                    </div>
                 </div>
             </div>
             <br>

@@ -1,11 +1,16 @@
 
 {% extends 'admin/admin_base.html' %}
-
+{% load static %}
 {% block title %}Leave Request{% endblock %}
-
+{% block additional_head %}
+    <script type="text/javascript" src="{% static 'js/leaverequest.js' %}"></script>
+{% endblock %}
 {% block content %}
+
 <div class="card">
   <h2>Leave Requests</h2>
+
+
   <table id="details">
     <thead>
       <tr>
@@ -18,13 +23,100 @@
         <th>Actions</th>
       </tr>
     </thead>
+    <tbody>
+            {% for leave in leaves %}
+            <tr data-reason="{{ leave.reason }}" data-balance="{{ leave.emp.balance }}" data-emp="{{ leave.leave_request_id }}" data-status="{{ leave.status }}">
+                <td>{{ leave.emp.firstname }} {{ leave.emp.lastname }}</td>
+                <td>{{ leave.leavetypeid.leave_type_name }}</td>
+                <td>{{ leave.startdate }}</td>
+                <td>{{ leave.enddate }}</td>
+                <td>{{ leave.duration }}</td>
+                <td>{{ leave.status }}</td>
+                <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Leavedetails">View</button>
+                </td>
 
-  </table>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="Leavedetails" tabindex="-1" aria-labelledby="LeavedetailsLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="container-fluid h-100">
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-4 text-center">
+             {% if profile_image %}
+             <img src="{{ profile_image.url }}" alt="{{ employee.firstname }}'s Profile Image" class="img-fluid rounded-circle" >
+             {% else %}
+             <img src="{% static 'no_profile_img/no.jpg' %}" alt="Default Profile Image" class="img-fluid rounded-circle" >
+             {% endif %}
+        </div>
+  </div>
+    <div class="card-body">
+<div class="container">
+                <form method="POST" action="{% url 'leaveRequest' %}">
+                    {% csrf_token %}
+            <input type="hidden" name="empid" id="empid">
+            <div class="form-group row">
+                <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-name" disabled>
+                </div>
+            </div>
+            <br>
+
+
+            <div class="form-group row">
+                <label for="leave-type" class="col-md-3 col-form-label">Leave Type:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-type"  disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="reason" class="col-md-3 col-form-label">Reason:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="Reason" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="start-date" class="col-md-3 col-form-label">Start Date:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="start-date" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="end-date" class="col-md-3 col-form-label">End Date:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="end-date" disabled>
+                </div>
+            </div>
+            <br>
+           <div class="form-group row">
+                <label for="days" class="col-md-3 col-form-label">No of Days:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="days" disabled>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="leave-balance" class="col-md-3 col-form-label">Leave Balance:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="leave-balance" disabled>
+                </div>
+            </div>
+                    <br>
+                    <button type="submit" class="btn btn-success pending-buttons" name="action" value="accept">Accept</button>
+                    <button type="submit" class="btn btn-danger pending-buttons" name="action" value="reject">Reject</button>
+        </form>
 </div>
-<script>
-        $(document).ready(function() {
-            $('#details').DataTable();
-        });
-    </script>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 {% endblock %}

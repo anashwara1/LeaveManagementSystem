@@ -11,6 +11,7 @@
   <link href="{% static 'css/employee/style.css' %}" rel="stylesheet">
   <link href="{% static 'css/employee/profile_img.css' %}" rel="stylesheet">
   <script type="text/javascript" src="{% static 'js/jquery-3.7.0.min.js' %}"></script>
+     <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/dataTables.min.js' %}"></script>
   {% block additional_head %}{% endblock %}
 </head>
@@ -28,8 +29,9 @@
         </div>
         </div>
         <div class="navbar-nav ml-auto">
+            <a class="nav-link {% if request.path == '/reset_password/' %}active{% endif %}" href="{% url 'resetpassword' %}">Reset Password</a>
             <a class="nav-link {% if request.path == '/profile/' %}active{% endif %}" href="{% url 'profile' %}">Profile</a>
-            <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="{% url 'login' %}">Logout</a>
+            <a class="nav-link {% if request.path == '/logout/' %}active{% endif %}" href="{% url 'logout' %}">Logout</a>
         </div>
   </nav>
 

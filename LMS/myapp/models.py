@@ -42,11 +42,17 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('is_manager', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Super user must have is_staff true')
 
-        return self.create_user(email, password, **extra_fields)
+        user = self.create_user(email, password, **extra_fields)
+
+        manager = Managers(emp=user)
+        manager.save()
+
+        return user
 
 
 class Employees(AbstractUser, PermissionsMixin):
@@ -65,11 +71,13 @@ class Employees(AbstractUser, PermissionsMixin):
     created_at = models.DateTimeField(db_column='Created_at', blank=True, null=True)  # Field name made lowercase.
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
+    is_manager = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['emp_id', 'firstname', 'lastname', 'date_of_joining']
 
 
     def natural_key(self):

@@ -1,0 +1,70 @@
+{% load static %}
+
+<html lang="en">
+<head>
+  <link href="{% static 'css/landing.css' %}" rel="stylesheet">
+   <link rel="icon" type="image/png" href="{% static 'js/lms_favicon.png' %}">
+  <title>Landing Page</title>
+  <link href="{% static 'css/landingPage/swiper-bundle.min.css' %}" rel="stylesheet">
+<!--  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">-->
+  <script type="text/javascript" src="{% static 'js/landing.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/landingPage/swiper-bundle.min.js' %}"></script>
+<!--  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
+</head>
+
+<body>
+<main>
+  <div>
+    <span>Smallday</span>
+    <h1>Leave Management System</h1>
+    <hr>
+    <p>Leave Simplified, Work Amplified</p>
+    <a href="{% url 'login' %}">Login</a>
+  </div>
+  <div class="swiper">
+    <div class="swiper-wrapper">
+
+      <div class="swiper-slide swiper-slide--two">
+        <div>
+          <h2></h2>
+          <p>
+          </p>
+        </div>
+      </div>
+
+      <div class="swiper-slide swiper-slide--three">
+        <div>
+          <h2></h2>
+          <p>
+
+          </p>
+        </div>
+      </div>
+
+      <div class="swiper-slide swiper-slide--four">
+
+        <div>
+          <h2></h2>
+          <p>
+
+          </p>
+        </div>
+      </div>
+
+      <div class="swiper-slide swiper-slide--five">
+
+        <div>
+          <h2></h2>
+          <p>
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- Add Pagination -->
+    <div class="swiper-pagination"></div>
+  </div>
+  <img src="{% static 'landingPageImg/landingBG.webp' %}" alt="" class="bg">
+
+</main>
+</body>
+</html>
