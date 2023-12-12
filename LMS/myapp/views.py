@@ -245,7 +245,7 @@ def register(request):
                     password=password,
                     date_of_joining=doj,
                     designation=desig_object,
-                    balance=2,
+                    balance=config('leave_initial'),
                     department=dept_object,
                     profile_image=f"profile_images/{file_name}" if file_name else None
                 )
