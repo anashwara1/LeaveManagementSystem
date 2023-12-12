@@ -9,6 +9,9 @@ from django.contrib.auth import logout
 
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+
 from .models import Department, Designation
 from django.contrib.auth.models import User
 from .models import Employees, Department, Designation, Leavebalance, LeaveTypes, LeaveRequest, Managers
@@ -48,37 +51,42 @@ def delete_leave(request, leave_id):
     return redirect('leavehistory')
 
 
+class LoginView(View):
+    template_name = 'login.html'
 
+    def get(self, request):
+        return render(request, self.template_name)
 
-def logins(request):
-    if request.method == 'POST':
+    def post(self, request):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
-        # managers = Managers.objects.all()
+
         if user is not None:
-            # is_manager = any(user.emp_id == manager.emp.emp_id for manager in managers)
             if user.is_manager:
                 login(request, user)
                 return redirect('dashboard')
             else:
                 login(request, user)
                 return redirect('emp_dashboard')
-
-        # Handle invalid login here
         else:
             print("Invalid login attempt.")
             messages.error(request, "Invalid Credentials. Please check your username and password.")
-
-    return render(request, 'login.html')
+            return render(request, self.template_name)
 
 
 User = get_user_model()
 
-def forgotpass(request):
-    if request.method == 'POST':
-        email = request.POST['email']
 
+class ForgotPassword(View):
+
+    template_name = 'forgotpassword.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        email = request.POST['email']
 
         try:
             user = User.objects.get(email=email)
@@ -87,7 +95,6 @@ def forgotpass(request):
             messages.error(request, 'This email is not registered. Please enter a registered email address.')
             return redirect('forgotpassword')
 
-        # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
         fname = user.firstname
         lname = user.lastname
@@ -108,7 +115,7 @@ def forgotpass(request):
         messages.success(request, 'Mail is sent. Please check your mail for the OTP')
         return redirect('changepassword')
 
-    return render(request, 'forgotpassword.html')
+
 
 
 @login_required(login_url='/login')
@@ -116,13 +123,15 @@ def empdashboard(request):
     return render(request, 'employee/dashboard.html')
 
 def landingPage(request):
-    return render(request,'landingPage.html')
+    return render(request, 'landingPage.html')
 
 
 # common
-@login_required(login_url='/login')
-def applyleave(request):
-    if request.method == 'POST':
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class ApplyLeave(View):
+    template_name = 'applyleave.html'
+
+    def post(self, request):
         leavetype = request.POST['leavetype']
         startdate = request.POST['startdate']
         enddate = request.POST['enddate']
@@ -141,28 +150,35 @@ def applyleave(request):
 
         new_leave.save()
         messages.success(request, 'Leave Request sent successfully.')
-    return render(request, 'applyleave.html')
+        return render(request, self.template_name)
+
+    def get(self, request,):
+        return render(request, self.template_name)
 
 
-@login_required(login_url='/login')
-def leavehistory(request):
-    user = Employees.objects.get(email=request.user.email)
-    emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
-    context = {
-        'leave_requests': emp_leaves,
-    }
-    return render(request, 'leavehistory.html', context)
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class LeaveHistory(View):
+    template_name = 'leavehistory.html'
+
+    def get(self, request):
+        user = Employees.objects.get(email=request.user.email)
+        emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
+        context = {
+            'leave_requests': emp_leaves,
+        }
+        return render(request, self.template_name, context)
 
 
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class ResetPassword(View):
+    template_name = 'resetpassword.html'
 
-@login_required(login_url='/login')
-def resetpassword(request):
-    if request.method == 'POST':
+    def post(self, request):
         oldpass = request.POST['oldpassword']
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        user = User.objects.get(email=request.user.email)
+        user = get_user_model().objects.get(email=request.user.email)
 
         if not check_password(oldpass, user.password):
             messages.error(request, 'The old password entered is wrong')
@@ -175,8 +191,12 @@ def resetpassword(request):
                 authenticated_user = authenticate(request, email=request.user.email, password=newpass)
                 login(request, authenticated_user)
                 messages.success(request, 'Password reset successful')
-                return render(request, 'resetpassword.html')
-    return render(request, 'resetpassword.html', {'messages': messages.get_messages(request)})
+                return render(request, self.template_name)
+        return render(request, self.template_name, {'messages': messages.get_messages(request)})
+
+    def get(self, request):
+        return render(request, self.template_name, {'messages': messages.get_messages(request)})
+
 
 
 
@@ -280,9 +300,12 @@ def register(request):
     return render(request, 'register.html', context)
 
 
-@login_required(login_url='/login')
-def dashboard(request):
-    return render(request, 'admin/dashboard.html')
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class Dashboard(View):
+    template_name = 'admin/dashboard.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
 
 
 @login_required(login_url='/login')
@@ -341,8 +364,10 @@ def emppage(request):
 
     return render(request, 'emppage.html', context)
 
-def changepassword(request):
-    if request.method == 'POST':
+class ChangePassword(View):
+    template_name = 'changepassword.html'
+
+    def post(self, request):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
         otp = request.POST['otp']
@@ -362,8 +387,10 @@ def changepassword(request):
                 del request.session['reset_email']
                 messages.success(request, 'Password reset successful')
                 return redirect('login')
+        return render(request, self.template_name)
 
-    return render(request, 'changepassword.html')
+    def get(self, request):
+        return render(request, self.template_name)
 
 
 # retrieving data from database to profile
@@ -398,6 +425,9 @@ def profile(request):
             return render(request, 'profile.html', {'error': 'Employee not found'})
 
 
-def logout_view(request):
-    logout(request)
-    return render(request, 'landingPage.html')
+class Logout(View):
+    template_name = 'landingPage.html'
+
+    def get(self, request):
+        logout(request)
+        return render(request, self.template_name)
