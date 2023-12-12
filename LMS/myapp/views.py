@@ -89,12 +89,13 @@ def forgotpass(request):
 
         # User is found, proceed with the rest of your logic
         otp = random.randint(1000, 9999)
-
+        fname = user.firstname
+        lname = user.lastname
         subject = 'Forgot Password OTP'
         otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
-        otp=f'{otp}'
+
         otp_template = otp_template.replace('\\n', '\n')
-        message = otp_template.format(otp=otp)
+        message = otp_template.format(otp=otp,fname = fname,lname=lname)
         # message = f'Change your password using this otp : {otp}'
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
@@ -262,15 +263,19 @@ def register(request):
                 new_user.save()
 
                 subject = 'Registration Confirmation'
-                message = f'Your account has been successfully registered, {fname} {lname}!'
+                message_template = config('MESSAGE_TEMPLATE')
+
+                message_template = message_template.replace('\\n','\n')
+                message = message_template.format(fname=fname,lname=lname,email=email,password =password)
+
                 from_email = config('EMAIL_HOST_USER')
                 recipient_list = [email]
+
 
                 send_mail(subject, message, from_email, recipient_list)
 
                 messages.success(request, 'Employee registered successfully')
 
-               # return redirect('login')  # Redirect to login page after successful registration
 
     return render(request, 'register.html', context)
 
