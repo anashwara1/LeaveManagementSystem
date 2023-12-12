@@ -7,8 +7,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
 
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponseNotAllowed
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import TemplateView, DetailView
+
 from .models import Department, Designation
 from django.contrib.auth.models import User
 from .models import Employees, Department, Designation, Leavebalance, LeaveTypes, LeaveRequest, Managers
@@ -16,38 +20,28 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 import random
 
-def get_leave(request, leave_id):
-    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
-    data = {
-        'leavetypeid': leave.leavetypeid_id,
-        'startdate': leave.startdate,
-        'enddate': leave.enddate,
-        'reason': leave.reason,
-        # Add other fields as needed
-    }
-    return JsonResponse(data)
-
-def edit_leave(request, leave_id):
-    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
-
-    # Update leave details based on the POST data
-    leave.leavetypeid_id = request.POST.get('leavetype')
-    leave.startdate = request.POST.get('startdate')
-    leave.enddate = request.POST.get('enddate')
-    leave.reason = request.POST.get('reason')
-    # Update other fields as needed
-    leave.save()
-
-    return redirect('leavehistory')
-# Create your views here.
-def delete_leave(request, leave_id):
-    leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
-    leave.delete()
-
-    # messages.success(request, 'Leave request deleted successfully')
-    return redirect('leavehistory')
 
 
+class EditLeaveView(View):
+    def post(self, request, leave_id, *args, **kwargs):
+        leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+
+        # Update leave details based on the POST data
+        leave.leavetypeid_id = request.POST.get('leavetype')
+        leave.startdate = request.POST.get('startdate')
+        leave.enddate = request.POST.get('enddate')
+        leave.reason = request.POST.get('reason')
+
+        leave.save()
+
+        return redirect('leavehistory')
+
+class DeleteLeaveView(View):
+    def post(self, request, leave_id, *args, **kwargs):
+        leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+        leave.delete()
+
+        return redirect('leavehistory')
 
 
 def logins(request):
@@ -110,13 +104,12 @@ def forgotpass(request):
 
     return render(request, 'forgotpassword.html')
 
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class EmpDashboardView(TemplateView):
+    template_name = 'employee/dashboard.html'
 
-@login_required(login_url='/login')
-def empdashboard(request):
-    return render(request, 'employee/dashboard.html')
-
-def landingPage(request):
-    return render(request,'landingPage.html')
+class LandingPageView(TemplateView):
+    template_name = 'landingPage.html'
 
 
 # common
@@ -186,19 +179,30 @@ def profile(request):
 
 
 # admin
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class RegisterView(View):
+    template_name = 'register.html'
 
-@login_required(login_url='/login')
-def register(request):
-    departments = Department.objects.values_list('dep_name', flat=True).distinct()
-    managers_id = Managers.objects.values_list('emp', flat=True).distinct()
-    managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
-    user = Employees.objects.get(email=request.user.email)
-    context = {
-        'departments': departments,
-        'managers': managers
-    }
+    def get(self, request, *args, **kwargs):
+        departments = Department.objects.values_list('dep_name', flat=True).distinct()
+        managers_id = Managers.objects.values_list('emp', flat=True).distinct()
+        managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
+        user = Employees.objects.get(email=request.user.email)
+        context = {
+            'departments': departments,
+            'managers': managers
+        }
+        return render(request, self.template_name, context)
 
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
+        departments = Department.objects.values_list('dep_name', flat=True).distinct()
+        managers_id = Managers.objects.values_list('emp', flat=True).distinct()
+        managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
+        user = Employees.objects.get(email=request.user.email)
+        context = {
+            'departments': departments,
+            'managers': managers
+        }
 
         empid = request.POST['empid']
         fname = request.POST['fname']
@@ -213,9 +217,8 @@ def register(request):
 
         if len(empid) >= 10:
             messages.error(request, 'Entered employee ID is too long')
-
         else:
-        # Process the file upload
+            # Process the file upload
             employee_image = request.FILES.get('employee_image', None)
 
             existing_employees = Employees.objects.filter(email=email)
@@ -271,40 +274,53 @@ def register(request):
                 from_email = config('EMAIL_HOST_USER')
                 recipient_list = [email]
 
-
                 send_mail(subject, message, from_email, recipient_list)
 
                 messages.success(request, 'Employee registered successfully')
 
-
-    return render(request, 'register.html', context)
-
+        return render(request, self.template_name, context)
 
 @login_required(login_url='/login')
 def dashboard(request):
     return render(request, 'admin/dashboard.html')
 
 
-@login_required(login_url='/login')
-def leaveRequest(request):
-    user = Employees.objects.get(email=request.user.email)
-    manager = Managers.objects.get(emp=user.emp_id)
-    emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
-    leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
-    for leave in leaves:
-        leave.duration = (leave.enddate - leave.startdate).days+1
-    context = {
-        'leaves': leaves
-    }
-    if request.method == 'POST':
-        action = request.POST['action']
-        leaveid = request.POST['empid']
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class LeaveRequestView(View):
+    template_name = 'admin/leaveRequest.html'
+
+    def get(self, request, *args, **kwargs):
+        user = Employees.objects.get(email=request.user.email)
+        manager = Managers.objects.get(emp=user.emp_id)
+        emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+        for leave in leaves:
+            leave.duration = (leave.enddate - leave.startdate).days + 1
+        context = {
+            'leaves': leaves
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        user = Employees.objects.get(email=request.user.email)
+        manager = Managers.objects.get(emp=user.emp_id)
+        emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+        for leave in leaves:
+            leave.duration = (leave.enddate - leave.startdate).days + 1
+        context = {
+            'leaves': leaves
+        }
+
+        action = request.POST.get('action')
+        leaveid = request.POST.get('empid')
         updated_leave = LeaveRequest.objects.get(leave_request_id=leaveid)
+
         if action == 'accept':
             updated_leave.status = 'Accepted'
-
         else:
             updated_leave.status = 'Rejected'
+
         updated_leave.save()
 
         email = Employees.objects.get(email=updated_leave.emp.email)
@@ -314,32 +330,31 @@ def leaveRequest(request):
         recipient_list = [email]
 
         send_mail(subject, message, from_email, recipient_list)
+
         return redirect('leaveRequest')
 
-    return render(request, 'admin/leaveRequest.html', context)
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class EmployeePageView(View):
+    template_name = 'emppage.html'
+    error_template_name = 'error_page.html'
 
+    def get(self, request, *args, **kwargs):
+        manager_emp_id = request.user.emp_id
 
-@login_required(login_url='/login')
-def emppage(request):
-    # Assuming request.user.emp_id is the emp_id for both login and manager
-    manager_emp_id = request.user.emp_id
+        try:
+            manager_instance = Managers.objects.get(emp=manager_emp_id)
+            manager_id = manager_instance.manager_id
+        except Managers.DoesNotExist:
+            return render(request, self.error_template_name)
 
-    try:
-        manager_instance = Managers.objects.get(emp=manager_emp_id)
-        manager_id = manager_instance.manager_id
-    except Managers.DoesNotExist:
-        # Handle the case where the manager with the given emp_id doesn't exist
-        # You might want to redirect to an error page or handle it as appropriate for your application
-        return render(request, 'error_page.html')
+        employees_managed = Employees.objects.filter(managed_by=manager_id)
 
-    employees_managed = Employees.objects.filter(managed_by=manager_id)
+        context = {
+            'employees_managed': employees_managed,
+            'manager_id': manager_id,
+        }
 
-    context = {
-        'employees_managed': employees_managed,
-        'manager_id': manager_id,
-    }
-
-    return render(request, 'emppage.html', context)
+        return render(request, self.template_name, context)
 
 def changepassword(request):
     if request.method == 'POST':
@@ -369,22 +384,25 @@ def changepassword(request):
 # retrieving data from database to profile
 
 
-@login_required(login_url='/login')
-def profile(request):
-    try:
-        employee = Employees.objects.get(email=request.user.email)
-        emp_id = employee.emp_id
-        firstname = employee.firstname
-        lastname = employee.lastname
-        department = employee.department
-        profile_image = employee.profile_image
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class ProfileView(View):
+    template_name = 'profile.html'
 
+    def get(self, request, *args, **kwargs):
         try:
-             leave_balance = Leavebalance.objects.get(empid=employee)
-        except Leavebalance.DoesNotExist:
+            employee = Employees.objects.get(email=request.user.email)
+            emp_id = employee.emp_id
+            firstname = employee.firstname
+            lastname = employee.lastname
+            department = employee.department
+            profile_image = employee.profile_image
+
+            try:
+                leave_balance = Leavebalance.objects.get(empid=employee)
+            except Leavebalance.DoesNotExist:
                 leave_balance = None
 
-        return render(request, 'profile.html', {
+            context = {
                 'employee': employee,
                 'emp_id': emp_id,
                 'firstname': firstname,
@@ -392,11 +410,12 @@ def profile(request):
                 'profile_image': profile_image,
                 'department': department,
                 'leave_balance': leave_balance,
-            })
+            }
 
-    except Employees.DoesNotExist:
-            return render(request, 'profile.html', {'error': 'Employee not found'})
+            return render(request, self.template_name, context)
 
+        except Employees.DoesNotExist:
+            return render(request, self.template_name, {'error': 'Employee not found'})
 
 def logout_view(request):
     logout(request)
