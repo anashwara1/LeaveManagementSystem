@@ -93,10 +93,7 @@ def forgotpass(request):
         lname = user.lastname
         subject = 'Forgot Password OTP'
         otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
-        otp=f'{otp}'
 
-        fname = f'{fname}'
-        lname = f'{lname}'
         otp_template = otp_template.replace('\\n', '\n')
         message = otp_template.format(otp=otp,fname = fname,lname=lname)
         # message = f'Change your password using this otp : {otp}'
