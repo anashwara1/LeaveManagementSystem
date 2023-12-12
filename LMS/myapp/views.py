@@ -264,14 +264,10 @@ def register(request):
 
                 subject = 'Registration Confirmation'
                 message_template = config('MESSAGE_TEMPLATE')
-                fname= f'{fname}'
-                lname= f'{lname}'
-                email= f'{email}'
-                password = f'{password}'
+
                 message_template = message_template.replace('\\n','\n')
                 message = message_template.format(fname=fname,lname=lname,email=email,password =password)
 
-                # message = f'Your account has been successfully registered, {fname} {lname}!'
                 from_email = config('EMAIL_HOST_USER')
                 recipient_list = [email]
 
@@ -280,7 +276,6 @@ def register(request):
 
                 messages.success(request, 'Employee registered successfully')
 
-               # return redirect('login')  # Redirect to login page after successful registration
 
     return render(request, 'register.html', context)
 
