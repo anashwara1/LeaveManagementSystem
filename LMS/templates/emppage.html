@@ -5,6 +5,9 @@
 {% block title %}Employees{% endblock %}
 
 {% block content %}
+<div class="card">
+    <h2>Employees</h2>
+    <br>
   <table class="table table-striped" id="details">
       <thead>
         <tr>
@@ -33,6 +36,7 @@
 
 
 </table>
+</div>
 <script>
         $(document).ready(function() {
             $('#details').DataTable();
