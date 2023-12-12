@@ -244,6 +244,8 @@ def register(request):
                     email=email,
                     password=password,
                     date_of_joining=doj,
+                    designation=desig_object,
+                    balance=2,
                     department=dept_object,
                     profile_image=f"profile_images/{file_name}" if file_name else None
                 )
@@ -348,13 +350,11 @@ def changepassword(request):
 def profile(request):
     try:
         employee = Employees.objects.get(email=request.user.email)
-        # desig = Designation.objects.filter(dep=employee.department)
         emp_id = employee.emp_id
         firstname = employee.firstname
         lastname = employee.lastname
         department = employee.department
         profile_image = employee.profile_image
-        # designation = desig
 
         try:
              leave_balance = Leavebalance.objects.get(empid=employee)
@@ -369,7 +369,6 @@ def profile(request):
                 'profile_image': profile_image,
                 'department': department,
                 'leave_balance': leave_balance,
-                # 'designation': designation
             })
 
     except Employees.DoesNotExist:

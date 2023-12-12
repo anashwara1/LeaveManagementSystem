@@ -64,6 +64,7 @@ class Employees(AbstractUser, PermissionsMixin):
     password = models.CharField(max_length=128, null=True, blank=True)
     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='Department_id', blank=True, null=True)  # Field name made lowercase.
+    designation = models.ForeignKey(Designation, models.DO_NOTHING, db_column='desig_id', blank=True, null=True)
     date_of_joining = models.DateField(db_column='Date_of_Joining', blank=True, null=True)  # Field name made lowercase.
     managed_by = models.ForeignKey('Managers', models.DO_NOTHING, db_column='Managed_by', blank=True, null=True)  # Field name made lowercase.
     is_active = models.BooleanField(default=True)  # Field name made lowercase.
