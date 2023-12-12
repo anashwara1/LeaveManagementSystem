@@ -25,7 +25,7 @@
     </thead>
     <tbody>
             {% for leave in leaves %}
-            <tr data-reason="{{ leave.reason }}" data-balance="{{ leave.emp.balance }}" data-emp="{{ leave.leave_request_id }}">
+            <tr data-reason="{{ leave.reason }}" data-balance="{{ leave.emp.balance }}" data-emp="{{ leave.leave_request_id }}" data-status="{{ leave.status }}">
                 <td>{{ leave.emp.firstname }} {{ leave.emp.lastname }}</td>
                 <td>{{ leave.leavetypeid.leave_type_name }}</td>
                 <td>{{ leave.startdate }}</td>
@@ -109,10 +109,8 @@
                 </div>
             </div>
                     <br>
-                    {% if leave.status is 'Pending' %}
-                    <button type="submit" class="btn btn-success" name="action" value="accept">Accept</button>
-                    <button type="submit" class="btn btn-danger" name="action" value="reject">Reject</button>
-                    {% endif %}
+                    <button type="submit" class="btn btn-success pending-buttons" name="action" value="accept">Accept</button>
+                    <button type="submit" class="btn btn-danger pending-buttons" name="action" value="reject">Reject</button>
         </form>
 </div>
             </div>
