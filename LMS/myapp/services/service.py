@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
 import random
-from LMS.myapp.models import *
+from myapp.models import *
 
 
 def user_authentication(request, email, password):
