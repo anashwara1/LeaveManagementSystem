@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
-
+from .services.service import *
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -60,18 +60,11 @@ class LoginView(View):
     def post(self, request):
         email = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, email=email, password=password)
+        redirect_url = user_authentication(request, email, password)
 
-        if user is not None:
-            if user.is_manager:
-                login(request, user)
-                return redirect('dashboard')
-            else:
-                login(request, user)
-                return redirect('emp_dashboard')
+        if redirect_url:
+            return redirect(redirect_url)
         else:
-            print("Invalid login attempt.")
-            messages.error(request, "Invalid Credentials. Please check your username and password.")
             return render(request, self.template_name)
 
 
@@ -87,35 +80,11 @@ class ForgotPassword(View):
 
     def post(self, request):
         email = request.POST['email']
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-
-            messages.error(request, 'This email is not registered. Please enter a registered email address.')
-            return redirect('forgotpassword')
-
-        otp = random.randint(1000, 9999)
-        fname = user.firstname
-        lname = user.lastname
-        subject = 'Forgot Password OTP'
-        otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
-
-        otp_template = otp_template.replace('\\n', '\n')
-        message = otp_template.format(otp=otp,fname = fname,lname=lname)
-        # message = f'Change your password using this otp : {otp}'
-        from_email = config('EMAIL_HOST_USER')
-        recipient_list = [email]
-
-        send_mail(subject, message, from_email, recipient_list)
-
-        request.session['reset_otp'] = otp
-        request.session['reset_email'] = email
-
-        messages.success(request, 'Mail is sent. Please check your mail for the OTP')
-        return redirect('changepassword')
-
-
+        redirect_url = forgot_password_service(request, email)
+        if redirect_url:
+            return redirect(redirect_url)
+        else:
+            return render(request, self.template_name)
 
 
 @login_required(login_url='/login')
@@ -137,22 +106,10 @@ class ApplyLeave(View):
         enddate = request.POST['enddate']
         reason = request.POST['reason']
 
-        leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
-        emp = Employees.objects.get(email=request.user.email)
-        new_leave = LeaveRequest(
-            startdate=startdate,
-            enddate=enddate,
-            reason=reason,
-            leavetypeid=leaveTypeid_object,
-            status='Pending',
-            emp=emp
-        )
-
-        new_leave.save()
-        messages.success(request, 'Leave Request sent successfully.')
+        apply_leave_service(request, startdate, enddate, reason, leavetype)
         return render(request, self.template_name)
 
-    def get(self, request,):
+    def get(self, request):
         return render(request, self.template_name)
 
 
@@ -161,11 +118,7 @@ class LeaveHistory(View):
     template_name = 'leavehistory.html'
 
     def get(self, request):
-        user = Employees.objects.get(email=request.user.email)
-        emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
-        context = {
-            'leave_requests': emp_leaves,
-        }
+        context = leave_history_service(request)
         return render(request, self.template_name, context)
 
 
@@ -178,21 +131,14 @@ class ResetPassword(View):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        user = get_user_model().objects.get(email=request.user.email)
+        success, message = reset_password_service(request, oldpass, newpass, confirmpass)
 
-        if not check_password(oldpass, user.password):
-            messages.error(request, 'The old password entered is wrong')
+        if success:
+            messages.success(request, message)
+            return render(request, self.template_name)
         else:
-            if newpass != confirmpass:
-                messages.error(request, 'Passwords entered must be the same')
-            else:
-                user.password = make_password(newpass)
-                user.save()
-                authenticated_user = authenticate(request, email=request.user.email, password=newpass)
-                login(request, authenticated_user)
-                messages.success(request, 'Password reset successful')
-                return render(request, self.template_name)
-        return render(request, self.template_name, {'messages': messages.get_messages(request)})
+            messages.error(request, message)
+            return render(request, self.template_name, {'messages': messages.get_messages(request)})
 
     def get(self, request):
         return render(request, self.template_name, {'messages': messages.get_messages(request)})
@@ -373,21 +319,13 @@ class ChangePassword(View):
         otp = request.POST['otp']
         sentotp = request.session.get('reset_otp')
 
-        if int(sentotp) != int(otp):
-            messages.error(request, 'OTP incorrect. Enter the correct otp')
+        success, message = change_password_service(request, sentotp, otp, newpass, confirmpass)
+        if success:
+            messages.success(request, message)
+            return redirect('login')
         else:
-            if newpass != confirmpass:
-                messages.error(request, 'Password entered must be the same')
-            else:
-                email = request.session.get('reset_email')
-                employee = Employees.objects.get(email=email)
-                employee.password = make_password(newpass)
-                employee.save()
-                del request.session['reset_otp']
-                del request.session['reset_email']
-                messages.success(request, 'Password reset successful')
-                return redirect('login')
-        return render(request, self.template_name)
+            messages.error(request, message)
+            return render(request, self.template_name)
 
     def get(self, request):
         return render(request, self.template_name)
