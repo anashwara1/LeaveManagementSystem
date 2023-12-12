@@ -5,6 +5,9 @@
 {% block title %}Employees{% endblock %}
 
 {% block content %}
+<div class="card">
+    <h2>Employees</h2>
+    <br>
   <table class="table table-striped" id="details">
       <thead>
         <tr>
@@ -16,10 +19,29 @@
           <th>Leave Balance</th>
         </tr>
       </thead>
+       <tbody>
+        {% for employee in employees_managed %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ employee.emp_id }}</td>
+            <td>{{ employee.firstname }} {{ employee.lastname }}</td>
+            <td>{{ designation.designation }}</td>
+            <td>{{ employee.date_of_joining }}</td>
+            <td>{{ leavebalance.balance}}</td>
+          </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+
 </table>
+</div>
 <script>
         $(document).ready(function() {
             $('#details').DataTable();
         });
     </script>
 {% endblock %}
+
+

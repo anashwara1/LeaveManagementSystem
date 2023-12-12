@@ -48,6 +48,8 @@ def delete_leave(request, leave_id):
     return redirect('leavehistory')
 
 
+
+
 def logins(request):
     if request.method == 'POST':
         email = request.POST['username']
@@ -312,9 +314,25 @@ def leaveRequest(request):
 
 @login_required(login_url='/login')
 def emppage(request):
-    return render(request, 'emppage.html')
+    # Assuming request.user.emp_id is the emp_id for both login and manager
+    manager_emp_id = request.user.emp_id
 
+    try:
+        manager_instance = Managers.objects.get(emp=manager_emp_id)
+        manager_id = manager_instance.manager_id
+    except Managers.DoesNotExist:
+        # Handle the case where the manager with the given emp_id doesn't exist
+        # You might want to redirect to an error page or handle it as appropriate for your application
+        return render(request, 'error_page.html')
 
+    employees_managed = Employees.objects.filter(managed_by=manager_id)
+
+    context = {
+        'employees_managed': employees_managed,
+        'manager_id': manager_id,
+    }
+
+    return render(request, 'emppage.html', context)
 
 def changepassword(request):
     if request.method == 'POST':
