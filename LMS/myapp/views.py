@@ -53,7 +53,8 @@ class LoginView(View):
     def post(self, request):
         email = request.POST['username']
         password = request.POST['password']
-        redirect_url = user_authentication(request, email, password)
+        loginservice = LoginService()
+        redirect_url = loginservice.user_authentication(request, email, password)
 
         if redirect_url:
             return redirect(redirect_url)
@@ -73,7 +74,8 @@ class ForgotPassword(View):
 
     def post(self, request):
         email = request.POST['email']
-        redirect_url = forgot_password_service(request, email)
+        forgotpasswordservice = ForgotPasswordService()
+        redirect_url = forgotpasswordservice.forgot_password_service(request, email)
         if redirect_url:
             return redirect(redirect_url)
         else:
@@ -98,7 +100,8 @@ class ApplyLeave(View):
         enddate = request.POST['enddate']
         reason = request.POST['reason']
 
-        apply_leave_service(request, startdate, enddate, reason, leavetype)
+        applyleaveservice = ApplyLeaveService()
+        applyleaveservice.apply_leave_service(request, startdate, enddate, reason, leavetype)
         return render(request, self.template_name)
 
     def get(self, request):
@@ -110,7 +113,8 @@ class LeaveHistory(View):
     template_name = 'leavehistory.html'
 
     def get(self, request):
-        context = leave_history_service(request)
+        leavehistoryservice = LeaveHistoryService()
+        context = leavehistoryservice.leave_history_service(request)
         return render(request, self.template_name, context)
 
 
@@ -123,7 +127,8 @@ class ResetPassword(View):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        success, message = reset_password_service(request, oldpass, newpass, confirmpass)
+        resetpasswordservice = ResetPasswordService()
+        success, message = resetpasswordservice.reset_password_service(request, oldpass, newpass, confirmpass)
 
         if success:
             messages.success(request, message)
@@ -333,7 +338,8 @@ class ChangePassword(View):
         otp = request.POST['otp']
         sentotp = request.session.get('reset_otp')
 
-        success, message = change_password_service(request, sentotp, otp, newpass, confirmpass)
+        changepasswordservice = ChangePasswordService()
+        success, message = changepasswordservice.change_password_service(request, sentotp, otp, newpass, confirmpass)
         if success:
             messages.success(request, message)
             return redirect('login')
