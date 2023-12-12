@@ -47,15 +47,7 @@ def delete_leave(request, leave_id):
     # messages.success(request, 'Leave request deleted successfully')
     return redirect('leavehistory')
 
-def display_employees(request):
-    manager = request.user
-    employees_managed = Employees.objects.filter(managed_by=manager)
 
-    context = {
-        'employees_managed': employees_managed
-    }
-
-    return render(request, 'emppage.html', context)
 
 
 def logins(request):
