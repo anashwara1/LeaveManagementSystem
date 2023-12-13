@@ -28,9 +28,9 @@
         <label for="leave_type" class="col-md-3 col-form-label">Leave Type:</label>
         <div class="col-md-3">
             <select class="form-select" id="leave_type" name="leavetype">
-                <option value="Sick Leave">Sick Leave</option>
-                <option value="Paid Leave">Paid Leave</option>
-                <option value="Other">Other</option>
+                {% for leavetype in leavetypes %}
+                <option value="{{ leavetype.leave_type_name }}">{{ leavetype.leave_type_name }}</option>
+                {% endfor %}
             </select>
           <br>
         </div>
