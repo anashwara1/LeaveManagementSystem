@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from myapp.models import Employees
+from Users.models import Employees
 
 
 class Leavebalance(models.Model):

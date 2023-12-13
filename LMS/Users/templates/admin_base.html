@@ -29,10 +29,10 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
-          <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="#">Apply Leave</a>
-          <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="#">Leave History</a>
+          <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="{% url 'applyleave' %}">Apply Leave</a>
+          <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="{% url 'leavehistory' %}">Leave History</a>
           <a class="nav-link {% if request.path == '/employees/' %}active{% endif %}" href="{% url 'employees' %}">Employees</a>
-          <a class="nav-link {% if request.path == '/leaveRequest/' %}active{% endif %}" href="#">Leave Requests</a>
+          <a class="nav-link {% if request.path == '/leaveRequest/' %}active{% endif %}" href="{% url 'leaveRequest' %}">Leave Requests</a>
           <a class="nav-link {% if request.path == '/register_user/' %}active{% endif %}" href="{% url 'register' %}">Add Employees</a>
         </div>
       </div>

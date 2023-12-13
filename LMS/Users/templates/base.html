@@ -24,8 +24,8 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-link {% if request.path == '/emp_dashboard/' %}active{% endif %}" href="{% url 'emp_dashboard' %}">Dashboard</a>
-          <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="#">Apply Leave</a>
-          <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="#">Leave History</a>
+          <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="{% url 'applyleave' %}">Apply Leave</a>
+          <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="{% url 'leavehistory' %}">Leave History</a>
         </div>
         </div>
         <div class="navbar-nav ml-auto">

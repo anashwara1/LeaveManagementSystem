@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from Users.models import Employees
 from leaves.services.service import LeaveService, ApplyLeaveService, LeaveHistoryService, LeaveRequestService
-from myapp.models import Employees
 
 
 class EditLeaveView(View):
@@ -55,7 +55,7 @@ class LeaveHistory(View):
 
 @method_decorator(login_required(login_url='/login'), name='dispatch')
 class LeaveRequestView(View):
-    template_name = 'admin/leaveRequest.html'
+    template_name = 'leaveRequest.html'
 
     def get(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)

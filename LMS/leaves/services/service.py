@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
+from Users.models import Employees, Managers
 from leaves.models import LeaveTypes, LeaveRequest
-from myapp.models import Employees, Managers
 
 
 class ApplyLeaveService:
@@ -39,7 +39,8 @@ class LeaveService:
 
     def edit_leave(self, leave_id, leavetype, startdate, enddate, reason):
         leave = self.get_leave(leave_id)
-        leave.leavetypeid_id = leavetype
+        leavetype = LeaveTypes.objects.get(leave_type_id=leavetype)
+        leave.leavetypeid = leavetype
         leave.startdate = startdate
         leave.enddate = enddate
         leave.reason = reason
