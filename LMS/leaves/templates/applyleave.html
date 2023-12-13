@@ -1,0 +1,85 @@
+{% load static %}
+{% if user.is_manager %}
+    {% include 'admin/admin_base.html' %}
+{% else %}
+    {% include 'employee/base.html' %}
+{% endif %}
+{% block additional_head %}
+    <script type="text/javascript" src="{% static 'js/applyleave.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="card">
+  <div class="card-header text-center">
+    Apply Leave
+  </div>
+  <div class="card-body">
+
+    <form action="{% url 'applyleave' %}" method="POST">
+        {% csrf_token %}
+      <div class="row">
+        <div class="col-md-12">
+    <div class="form-group row">
+        <label for="leave_type" class="col-md-3 col-form-label">Leave Type:</label>
+        <div class="col-md-3">
+            <select class="form-select" id="leave_type" name="leavetype">
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Paid Leave">Paid Leave</option>
+                <option value="Other">Other</option>
+            </select>
+          <br>
+        </div>
+    </div>
+</div>
+
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="start_date" class="col-md-3 col-form-label">Start Date:</label>
+            <div class="col-md-3">
+            <input type="date" class="form-control" id="start_date" placeholder="Start Date" name="startdate" min="{% now 'Y-m-d' %}" onchange="updateEndDateMin()" >
+            </div>
+          </div>
+          <br>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="end_date" class="col-md-3 col-form-label">End Date:</label>
+            <div class="col-md-3">
+            <input type="date" class="form-control" id="end_date" placeholder="End Date" name="enddate" min="{% now 'Y-m-d' %}">
+            </div>
+          </div>
+          <br>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label for="reason" class="col-md-3 col-form-label">Reason:</label>
+            <div class="col-md-3">
+            <textarea class="form-control" id="reason" rows="3" placeholder="Reason for leave" name="reason"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Apply Leave">
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
