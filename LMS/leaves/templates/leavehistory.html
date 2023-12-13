@@ -1,0 +1,102 @@
+{% load static %}
+{% if user.is_manager %}
+    {% include 'admin_base.html' %}
+{% else %}
+    {% include 'base.html' %}
+{% endif %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+
+    <table class="table table-striped" id="leaveTable">
+      <thead>
+        <tr>
+          <th>Leave Type</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for leave_request in leave_requests %}
+          <tr>
+            <td>{{ leave_request.leavetypeid.leave_type_name }}</td>
+            <td>{{ leave_request.startdate }}</td>
+            <td>{{ leave_request.enddate }}</td>
+            <td>{{ leave_request.status }}</td>
+            <td>
+              <button type="button" class="btn btn-primary btn-sm" onclick="editLeave(this)" data-reason="{{ leave_request.reason }}" data-leaveid="{{ leave_request.leave_request_id }}" >Edit</button>
+              <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ leave_request.leave_request_id }})">Delete</button>
+            </td>
+          </tr>
+
+          <!-- Edit Leave Modal -->
+
+          <div class="modal fade" id="editLeaveModal" tabindex="-1" role="dialog" aria-labelledby="editLeaveModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editLeaveModalLabel">Edit Leave</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <!-- Add the form fields for editing leave details -->
+                  <form id="editLeaveForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="editLeaveId" value="">
+                    <!-- Your form fields go here -->
+                    <div class="form-group">
+                      <label for="editLeaveType">Leave Type:</label>
+
+                      <select class="form-select" id="editLeaveType" name="leavetype" required>
+                         <option value="Sick Leave">Sick Leave</option>
+                         <option value="Paid Leave">Paid Leave</option>
+                         <option value="Other">Other</option>
+                      </select>
+
+
+
+                    </div>
+                    <div class="form-group">
+                      <label for="editStartDate">Start Date:</label>
+                      <input type="date" class="form-control" id="editStartDate" name="startdate" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="editEndDate">End Date:</label>
+                      <input type="date" class="form-control" id="editEndDate" name="enddate" required>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-group">
+                           <label for="reason" >Reason:</label>
+
+                             <textarea class="form-control" id="reason"  placeholder="Reason for leave" name="reason" required ></textarea>
+
+                      </div>
+                    </div>
+                    <!-- Add other form fields as needed -->
+                  </form>
+                  <!-- You can pre-fill the form with existing leave details -->
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="updateLeaveDetails({{ leave_request.leave_request_id }})">Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </tbody>
+    </table>
+     <script>
+        const csrfToken = "{{ csrf_token }}";
+    </script>
+    <script type="text/javascript" src="{% static 'js/leavehistory.js' %}"></script>
+
+
+  </div>
+</div>
+{% endblock %}
