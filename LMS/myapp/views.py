@@ -24,7 +24,6 @@ import random
 
 from .service import *
 
-
 class EditLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
         leavetype = request.POST.get('leavetype')
@@ -32,14 +31,15 @@ class EditLeaveView(View):
         enddate = request.POST.get('enddate')
         reason = request.POST.get('reason')
 
-        LeaveService.edit_leave(leave_id, leavetype, startdate, enddate, reason)
+        leave_service = LeaveService()
+        leave_service.edit_leave(leave_id, leavetype, startdate, enddate, reason)
         return redirect('leavehistory')
 
 class DeleteLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
-        LeaveService.delete_leave(leave_id)
+        leave_service = LeaveService()
+        leave_service.delete_leave(leave_id)
         return redirect('leavehistory')
-
 
 class LoginView(View):
     template_name = 'login.html'
@@ -195,13 +195,13 @@ def profile(request):
 
 
 # admin
-
 @method_decorator(login_required(login_url='/login'), name='dispatch')
 class RegisterView(View):
     template_name = 'register.html'
+    register_service = RegisterService()
 
     def get(self, request, *args, **kwargs):
-        context = RegisterService.get_departments_and_managers()
+        context = self.register_service.get_departments_and_managers()
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -216,11 +216,12 @@ class RegisterView(View):
         ismanager = request.POST['ismanager']
         manager = request.POST['manager']
 
-        context = RegisterService.register_employee(
+        context = self.register_service.register_employee(
             request, empid, fname, lname, email, doj, desig, dept, password, ismanager, manager
         )
 
         return render(request, self.template_name, context)
+
 
 @method_decorator(login_required(login_url='/login'), name='dispatch')
 class Dashboard(View):
@@ -236,7 +237,8 @@ class LeaveRequestView(View):
 
     def get(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)
-        leaves = LeaveRequestService.get_leave_requests(user)
+        leave_request_service = LeaveRequestService()
+        leaves = leave_request_service.get_leave_requests(user)
         context = {
             'leaves': leaves
         }
@@ -244,12 +246,13 @@ class LeaveRequestView(View):
 
     def post(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)
-        leaves = LeaveRequestService.get_leave_requests(user)
+        leave_request_service = LeaveRequestService()
+        leaves = leave_request_service.get_leave_requests(user)
 
         action = request.POST.get('action')
         leave_id = request.POST.get('empid')
 
-        LeaveRequestService.update_leave_status(leave_id, action)
+        leave_request_service.update_leave_status(leave_id, action)
 
         return redirect('leaveRequest')
 
@@ -261,12 +264,14 @@ class EmployeePageView(View):
     def get(self, request, *args, **kwargs):
         manager_emp_id = request.user.emp_id
 
-        context = EmployeePageService.get_managed_employees(manager_emp_id)
+        employee_page_service = EmployeePageService()
+        context = employee_page_service.get_managed_employees(manager_emp_id)
 
         if context is None:
             return render(request, self.error_template_name)
 
         return render(request, self.template_name, context)
+
 
 class ChangePassword(View):
     template_name = 'changepassword.html'
@@ -304,8 +309,10 @@ class ProfileView(View):
 
     def get(self, request, *args, **kwargs):
         email = request.user.email
-        context = ProfileService.get_employee_profile(email)
+        profile_service = ProfileService()
+        context = profile_service.get_employee_profile(email)
         return render(request, self.template_name, context)
+
 
 class Logout(View):
     template_name = 'landingPage.html'

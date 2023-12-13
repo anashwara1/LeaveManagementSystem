@@ -6,28 +6,25 @@ from django.shortcuts import get_object_or_404
 from .models import *
 
 class LeaveService:
-    @staticmethod
-    def edit_leave(leave_id, leavetype, startdate, enddate, reason):
-        leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+    def get_leave(self, leave_id):
+        return get_object_or_404(LeaveRequest, leave_request_id=leave_id)
 
-        # Update leave details based on the provided data
+    def edit_leave(self, leave_id, leavetype, startdate, enddate, reason):
+        leave = self.get_leave(leave_id)
         leave.leavetypeid_id = leavetype
         leave.startdate = startdate
         leave.enddate = enddate
         leave.reason = reason
-
         leave.save()
 
-    @staticmethod
-    def delete_leave(leave_id):
-        leave = get_object_or_404(LeaveRequest, leave_request_id=leave_id)
+    def delete_leave(self, leave_id):
+        leave = self.get_leave(leave_id)
         leave.delete()
 
 
 
 class ProfileService:
-    @staticmethod
-    def get_employee_profile(email):
+    def get_employee_profile(self, email):
         try:
             employee = Employees.objects.get(email=email)
             emp_id = employee.emp_id
@@ -56,8 +53,7 @@ class ProfileService:
 
 
 class EmployeePageService:
-    @staticmethod
-    def get_managed_employees(manager_emp_id):
+    def get_managed_employees(self, manager_emp_id):
         try:
             manager_instance = Managers.objects.get(emp=manager_emp_id)
             manager_id = manager_instance.manager_id
@@ -72,8 +68,7 @@ class EmployeePageService:
 
 
 class LeaveRequestService:
-    @staticmethod
-    def get_leave_requests(user):
+    def get_leave_requests(self, user):
         manager = Managers.objects.get(emp=user.emp_id)
         emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
         leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
@@ -81,8 +76,7 @@ class LeaveRequestService:
             leave.duration = (leave.enddate - leave.startdate).days + 1
         return leaves
 
-    @staticmethod
-    def update_leave_status(leave_id, action):
+    def update_leave_status(self, leave_id, action):
         updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
 
         if action == 'accept':
@@ -100,10 +94,8 @@ class LeaveRequestService:
 
         send_mail(subject, message, from_email, recipient_list)
 
-
 class RegisterService:
-    @staticmethod
-    def get_departments_and_managers():
+    def get_departments_and_managers(self):
         departments = Department.objects.values_list('dep_name', flat=True).distinct()
         managers_id = Managers.objects.values_list('emp', flat=True).distinct()
         managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
@@ -113,9 +105,8 @@ class RegisterService:
             'managers': managers
         }
 
-    @staticmethod
-    def register_employee(request, empid, fname, lname, email, doj, desig, dept, password, ismanager, manager):
-        context = RegisterService.get_departments_and_managers()
+    def register_employee(self, request, empid, fname, lname, email, doj, desig, dept, password, ismanager, manager):
+        context = self.get_departments_and_managers()
 
         if len(empid) >= 10:
             messages.error(request, 'Entered employee ID is too long')
@@ -152,7 +143,7 @@ class RegisterService:
             password=password,
             date_of_joining=doj,
             designation=desig_object,
-            balance=config('leave_initial'),  # Access LEAVE_INITIAL using config
+            balance=config('leave_initial'),
             department=dept_object,
             profile_image=f"profile_images/{file_name}" if file_name else None
         )
@@ -167,12 +158,12 @@ class RegisterService:
         new_user.save()
 
         subject = 'Registration Confirmation'
-        message_template = config('MESSAGE_TEMPLATE')  # Access MESSAGE_TEMPLATE using config
+        message_template = config('MESSAGE_TEMPLATE')
 
         message_template = message_template.replace('\\n', '\n')
         message = message_template.format(fname=fname, lname=lname, email=email, password=password)
 
-        from_email = config('EMAIL_HOST_USER')  # Access EMAIL_HOST_USER using config
+        from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
         send_mail(subject, message, from_email, recipient_list)
