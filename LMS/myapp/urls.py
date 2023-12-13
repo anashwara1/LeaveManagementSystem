@@ -3,8 +3,6 @@ from django.urls import path
 from . import views
 from .views import *
 
-from .views import EditLeaveView, DeleteLeaveView, EmpDashboardView, ProfileView, EmployeePageView, LeaveRequestView, \
-    RegisterView
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
