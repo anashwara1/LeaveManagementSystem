@@ -20,7 +20,6 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 import random
 
-from .service import *
 
 class EditLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
