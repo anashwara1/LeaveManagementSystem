@@ -1,17 +1,13 @@
+import random
 from decouple import config
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
-import random
-from django.conf import settings
-from django.shortcuts import get_object_or_404
-
-from myapp.models import LeaveTypes, Employees, LeaveRequest, Leavebalance, Managers, \
-    Department, Designation
+from Users.models import *
 
 
-class LoginService:
+class UserService:
     def user_authentication(self, request, email, password):
         user = authenticate(request, email=email, password=password)
 
@@ -27,8 +23,6 @@ class LoginService:
             messages.error(request, "Invalid Credentials. Please check your username and password.")
             return None
 
-
-class ForgotPasswordService:
     def forgot_password_service(self, request, email):
         User = get_user_model()
         try:
@@ -58,35 +52,6 @@ class ForgotPasswordService:
         messages.success(request, 'Mail is sent. Please check your mail for the OTP')
         return 'changepassword'
 
-
-class ApplyLeaveService:
-    def apply_leave_service(self, request, startdate, enddate, reason, leavetype):
-        leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
-        emp = Employees.objects.get(email=request.user.email)
-        new_leave = LeaveRequest(
-            startdate=startdate,
-            enddate=enddate,
-            reason=reason,
-            leavetypeid=leaveTypeid_object,
-            status='Pending',
-            emp=emp
-        )
-
-        new_leave.save()
-        messages.success(request, 'Leave Request sent successfully.')
-
-
-class LeaveHistoryService:
-    def leave_history_service(self, request):
-        user = Employees.objects.get(email=request.user.email)
-        emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
-        context = {
-            'leave_requests': emp_leaves,
-        }
-        return context
-
-
-class ResetPasswordService:
     def reset_password_service(self, request, oldpass, newpass, confirmpass):
         user = get_user_model().objects.get(email=request.user.email)
 
@@ -102,8 +67,6 @@ class ResetPasswordService:
                 login(request, authenticated_user)
                 return True, 'Password reset successful'
 
-
-class ChangePasswordService:
     def change_password_service(self, request, sentotp, otp, newpass, confirmpass):
         if int(sentotp) != int(otp):
             return False, 'OTP incorrect. Enter the correct otp'
@@ -119,27 +82,6 @@ class ChangePasswordService:
                 del request.session['reset_email']
                 return True, 'Password reset successful'
 
-
-            #
-class LeaveService:
-    def get_leave(self, leave_id):
-        return get_object_or_404(LeaveRequest, leave_request_id=leave_id)
-
-    def edit_leave(self, leave_id, leavetype, startdate, enddate, reason):
-        leave = self.get_leave(leave_id)
-        leave.leavetypeid_id = leavetype
-        leave.startdate = startdate
-        leave.enddate = enddate
-        leave.reason = reason
-        leave.save()
-
-    def delete_leave(self, leave_id):
-        leave = self.get_leave(leave_id)
-        leave.delete()
-
-
-
-class ProfileService:
     def get_employee_profile(self, email):
         try:
             employee = Employees.objects.get(email=email)
@@ -149,10 +91,6 @@ class ProfileService:
             department = employee.department
             profile_image = employee.profile_image
 
-            try:
-                leave_balance = Leavebalance.objects.get(empid=employee)
-            except Leavebalance.DoesNotExist:
-                leave_balance = None
 
             return {
                 'employee': employee,
@@ -161,14 +99,11 @@ class ProfileService:
                 'lastname': lastname,
                 'profile_image': profile_image,
                 'department': department,
-                'leave_balance': leave_balance,
             }
 
         except Employees.DoesNotExist:
             return {'error': 'Employee not found'}
 
-
-class EmployeePageService:
     def get_managed_employees(self, manager_emp_id):
         try:
             manager_instance = Managers.objects.get(emp=manager_emp_id)
@@ -182,35 +117,6 @@ class EmployeePageService:
             'manager_id': manager_id,
         }
 
-
-class LeaveRequestService:
-    def get_leave_requests(self, user):
-        manager = Managers.objects.get(emp=user.emp_id)
-        emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
-        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
-        for leave in leaves:
-            leave.duration = (leave.enddate - leave.startdate).days + 1
-        return leaves
-
-    def update_leave_status(self, leave_id, action):
-        updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-
-        if action == 'accept':
-            updated_leave.status = 'Accepted'
-        else:
-            updated_leave.status = 'Rejected'
-
-        updated_leave.save()
-
-        email = Employees.objects.get(email=updated_leave.emp.email)
-        subject = f'LEAVE REQUEST {action.upper()}ED'
-        message = f'The leave request you have sent has been {action}ed'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email.email]
-
-        send_mail(subject, message, from_email, recipient_list)
-
-class RegisterService:
     def get_departments_and_managers(self):
         departments = Department.objects.values_list('dep_name', flat=True).distinct()
         managers_id = Managers.objects.values_list('emp', flat=True).distinct()
@@ -287,5 +193,3 @@ class RegisterService:
         messages.success(request, 'Employee registered successfully')
 
         return context
-
-

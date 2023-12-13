@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp',
     'leaves',
+    'Users',
 ]
 
 MIDDLEWARE = [
@@ -135,10 +135,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "Users/static"
 ]
 
-AUTH_USER_MODEL = 'myapp.Employees'
+AUTH_USER_MODEL = 'Users.Employees'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
