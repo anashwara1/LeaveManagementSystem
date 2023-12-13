@@ -39,15 +39,27 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+
+        department_name = input("Department: ")
+        designation_name = input("Designation: ")
+
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_manager', True)
+        extra_fields.setdefault('balance', 2)
+
+        department, created = Department.objects.get_or_create(dep_name=department_name)
+        designation, created = Designation.objects.get_or_create(designation=designation_name, dep=department)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Super user must have is_staff true')
 
         user = self.create_user(email, password, **extra_fields)
+
+        user.department = department
+        user.designation = designation
+        user.save()
 
         manager = Managers(emp=user)
         manager.save()
@@ -80,9 +92,9 @@ class Employees(AbstractUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['emp_id', 'firstname', 'lastname', 'date_of_joining']
 
-
     def natural_key(self):
         return (self.email,)
+
     class Meta:
         managed = True
         db_table = 'Employees'

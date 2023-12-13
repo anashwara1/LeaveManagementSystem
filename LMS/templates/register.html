@@ -75,7 +75,7 @@
             <div class="form-group row">
                 <label for="employee-doj" class="col-md-3 col-form-label bold-label">Date of Joining:</label>
                 <div class="col-md-9">
-                    <input type="date" class="form-control" id="employee-doj" name="doj" required>
+                    <input type="date" class="form-control" id="employee-doj" name="doj" max="{% now 'Y-m-d' %}"required>
                 </div>
             </div>
             <br>
@@ -122,4 +122,5 @@
             <button>Submit</button>
         </form>
 </div>
+
 {% endblock %}
