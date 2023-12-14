@@ -1,5 +1,17 @@
-$(document).ready(function () {
-        var table = $('#details').DataTable();
+$(document).ready(function() {
+    var table = $('#details').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+        });
+
+
+    // Trigger DataTables export when the "Download" button is clicked
+//    $('#downloadButton').on('click', function() {
+//        table.buttons.exportData();
+//    });
+//});
 
         $('.btn-primary').on('click', function () {
             var row = $(this).closest('tr');
@@ -38,4 +50,4 @@ $(document).ready(function () {
         }
 
         });
-    });
+});
