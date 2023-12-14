@@ -8,6 +8,11 @@ from leaves.models import LeaveTypes, LeaveRequest
 
 
 class ApplyLeaveService:
+
+    def get_leave_types(self):
+        leavetypes = LeaveTypes.objects.all().distinct()
+        return leavetypes
+
     def apply_leave_service(self, request, startdate, enddate, reason, leavetype):
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
         emp = Employees.objects.get(email=request.user.email)

@@ -40,7 +40,10 @@ class ApplyLeave(View):
         return render(request, self.template_name)
 
     def get(self, request):
-        return render(request, self.template_name)
+        applyleaveservice = ApplyLeaveService()
+        context = {
+            'leavetypes': applyleaveservice.get_leave_types()}
+        return render(request, self.template_name, context)
 
 
 @method_decorator(login_required(login_url='/login'), name='dispatch')
