@@ -1,39 +1,6 @@
-/* Add your custom styles here */
-/*@import url("https://fonts.googleapis.com/css2?family=Grandstander&display=swap");*/
+   /* Add your custom styles here */
 
-.navbar {
-    background-color: #0976ac;
-}
-
-.navbar-dark {
-    color: #fff;
-}
-
-body {
-
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-#custom-navbar {
-  background-color: #0976ac;
-}
-
-.main-content {
-  margin-top: 60px;
-}
-
-.custom-card {
-  height: 200px;
-}
-
-.custom-table {
-  margin-top: 40px;
-}
-
-
-.custom-card {
+   .custom-card {
       border: none;
       border-radius: 15px;
       overflow: hidden;
@@ -109,6 +76,4 @@ body {
     .custom-card .btn-warning {
       color: #fff;
     }
-
-
 

@@ -1,3 +1,17 @@
 .card-body {
     height: 200px;
 }
+
+/* Add these styles to your CSS file */
+.card-purple {
+    background-color: #3498db;
+}
+
+.card-red {
+    background-color: #e74c3c;
+}
+
+.card-lite {
+    background-color: #77DD77;
+}
+
