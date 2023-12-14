@@ -62,9 +62,12 @@ class LeaveRequestService:
 
     def update_leave_status(self, leave_id, action):
         updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-
+        duration = (updated_leave.enddate - updated_leave.startdate).days + 1
         if action == 'accept':
             updated_leave.status = 'Accepted'
+            updated_leave.emp.balance -= duration
+            updated_leave.emp.save()
+
         else:
             updated_leave.status = 'Rejected'
 
