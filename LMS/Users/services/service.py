@@ -8,29 +8,22 @@ from Users.models import *
 
 
 class UserService:
-    def user_authentication(self, request, email, password):
-        user = authenticate(request, email=email, password=password)
+    def user_authentication(self, user):
 
         if user is not None:
             if user.is_superuser:
-                login(request, user)
                 return 'dashboard'
             else:
-                login(request, user)
                 return 'emp_dashboard'
         else:
-            print("Invalid login attempt.")
-            messages.error(request, "Invalid Credentials. Please check your username and password.")
             return None
 
-    def forgot_password_service(self, request, email):
+    def forgot_password_service(self, email):
         User = get_user_model()
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-
-            messages.error(request, 'This email is not registered. Please enter a registered email address.')
-            return 'forgotpassword'
+            return None, 'forgotpassword'
 
         otp = random.randint(1000, 9999)
         fname = user.first_name
@@ -45,14 +38,9 @@ class UserService:
 
         send_mail(subject, message, from_email, recipient_list)
 
-        request.session['reset_otp'] = otp
-        request.session['reset_email'] = email
+        return otp, 'changepassword'
 
-        messages.success(request, 'Mail is sent. Please check your mail for the OTP')
-        return 'changepassword'
-
-    def reset_password_service(self, request, oldpass, newpass, confirmpass):
-        user = get_user_model().objects.get(email=request.user.email)
+    def reset_password_service(self, oldpass, newpass, confirmpass, user):
 
         if not check_password(oldpass, user.password):
             return False, 'The old password entered is wrong'
@@ -62,23 +50,18 @@ class UserService:
             else:
                 user.password = make_password(newpass)
                 user.save()
-                authenticated_user = authenticate(request, email=request.user.email, password=newpass)
-                login(request, authenticated_user)
                 return True, 'Password reset successful'
 
-    def change_password_service(self, request, sentotp, otp, newpass, confirmpass):
+    def change_password_service(self, sentotp, otp, newpass, confirmpass, email):
         if int(sentotp) != int(otp):
             return False, 'OTP incorrect. Enter the correct otp'
         else:
             if newpass != confirmpass:
                 return False, 'Password entered must be the same'
             else:
-                email = request.session.get('reset_email')
                 employee = Employees.objects.get(email=email)
                 employee.password = make_password(newpass)
                 employee.save()
-                del request.session['reset_otp']
-                del request.session['reset_email']
                 return True, 'Password reset successful'
 
     def get_employee_profile(self, email):
@@ -91,7 +74,7 @@ class UserService:
         except Employees.DoesNotExist:
             return {'error': 'Employee not found'}
 
-    def get_managed_employees(self, manager_emp_id):
+    def get_managed_employees(self):
         try:
             manager_instance = Employees.objects.filter(is_staff=False)
         except Employees.DoesNotExist:
@@ -110,18 +93,13 @@ class UserService:
             'designations': designations,
         }
 
-    def register_employee(self, request, empid, fname, lname, email, doj, desig, dept, password, ismanager):
+    def register_employee(self, empid, fname, lname, email, doj, desig, dept, password, ismanager, employee_image, existing_employees, other_dept):
         context = self.get_departments_and_managers()
 
         if len(empid) >= 10:
-            messages.error(request, 'Entered employee ID is too long')
             return context
 
-        employee_image = request.FILES.get('employee_image', None)
-        existing_employees = Employees.objects.filter(email=email)
-
         if existing_employees.exists():
-            messages.error(request, 'Entered email is already registered')
             return context
 
         if employee_image:
@@ -133,7 +111,6 @@ class UserService:
             file_name = None
 
         if dept == 'Other':
-            other_dept = request.POST['other-dept']
             dept_object, created = Department.objects.get_or_create(dep_name=other_dept)
         else:
             dept_object, created = Department.objects.get_or_create(dep_name=dept)
@@ -164,7 +141,5 @@ class UserService:
         recipient_list = [email]
 
         send_mail(subject, message, from_email, recipient_list)
-
-        messages.success(request, 'Employee registered successfully')
 
         return context

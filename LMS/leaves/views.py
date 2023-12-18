@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -34,9 +35,11 @@ class ApplyLeave(View):
         startdate = request.POST['startdate']
         enddate = request.POST['enddate']
         reason = request.POST['reason']
+        emp = Employees.objects.get(email=request.user.email)
 
         applyleaveservice = ApplyLeaveService()
-        applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype)
+        applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype, emp)
+        messages.success(request, 'Leave Request sent successfully.')
         return render(request, self.template_name)
 
     def get(self, request):
@@ -52,7 +55,8 @@ class LeaveHistory(View):
 
     def get(self, request):
         leavehistoryservice = LeaveHistoryService()
-        context = leavehistoryservice.leave_history_service()
+        user = Employees.objects.get(email=request.user.email)
+        context = leavehistoryservice.leave_history_service(user)
         return render(request, self.template_name, context)
 
 
@@ -63,7 +67,7 @@ class LeaveRequestView(View):
     def get(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)
         leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests(user)
+        leaves = leave_request_service.get_leave_requests()
         context = {
             'leaves': leaves
         }

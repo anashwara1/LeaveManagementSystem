@@ -1,10 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
+
+from Users.models import Employees
 from Users.services.service import UserService
 
 # Create your views here.
@@ -22,11 +24,20 @@ class LoginView(View):
     def post(self, request):
         email = request.POST['username']
         password = request.POST['password']
-        redirect_url = userservice.user_authentication(email, password)
+        user = authenticate(request, email=email, password=password)
+        redirect_url = userservice.user_authentication(user)
+
+        if user is not None:
+            if user.is_superuser:
+                login(request, user)
+            else:
+                login(request, user)
 
         if redirect_url:
             return redirect(redirect_url)
         else:
+            print("Invalid login attempt.")
+            messages.error(request, "Invalid Credentials. Please check your username and password.")
             return render(request, self.template_name)
 
 
@@ -42,9 +53,19 @@ class ForgotPassword(View):
 
     def post(self, request):
         email = request.POST['email']
-        redirect_url = userservice.forgot_password_service(email)
-        if redirect_url:
+        otp, redirect_url = userservice.forgot_password_service(email)
+
+        request.session['reset_otp'] = otp
+        request.session['reset_email'] = email
+
+        if redirect_url == 'forgotpassword':
+            messages.error(request, 'This email is not registered. Please enter a registered email address.')
             return redirect(redirect_url)
+
+        elif redirect_url == 'changepassword':
+            messages.success(request, 'Mail is sent. Please check your mail for the OTP')
+            return redirect(redirect_url)
+
         else:
             return render(request, self.template_name)
 
@@ -67,9 +88,13 @@ class ResetPassword(View):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        success, message = userservice.reset_password_service(oldpass, newpass, confirmpass)
+        user = get_user_model().objects.get(email=request.user.email)
+
+        success, message = userservice.reset_password_service(oldpass, newpass, confirmpass, user)
 
         if success:
+            authenticated_user = authenticate(request, email=request.user.email, password=newpass)
+            login(request, authenticated_user)
             messages.success(request, message)
             return render(request, self.template_name)
         else:
@@ -88,7 +113,7 @@ class RegisterView(View):
         context = userservice.get_departments_and_managers()
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         empid = request.POST['empid']
         fname = request.POST['fname']
         lname = request.POST['lname']
@@ -99,8 +124,27 @@ class RegisterView(View):
         password = request.POST['password']
         ismanager = request.POST['ismanager']
 
+        if dept == 'Other':
+            other_dept = request.POST['other-dept']
+
+        else:
+            other_dept = None
+
+        employee_image = request.FILES.get('employee_image', None)
+        existing_employees = Employees.objects.filter(email=email)
+        print(existing_employees.exists())
+
+        if len(empid) >= 10:
+            messages.error(request, 'Entered employee ID is too long')
+
+        elif existing_employees.exists():
+            messages.error(request, 'Entered email is already registered')
+
+        else:
+            messages.success(request, 'Employee registered successfully')
+
         context = userservice.register_employee(
-            empid, fname, lname, email, doj, desig, dept, password, ismanager
+            empid, fname, lname, email, doj, desig, dept, password, ismanager, employee_image, existing_employees, other_dept
         )
 
         return render(request, self.template_name, context)
@@ -119,8 +163,7 @@ class EmployeePageView(View):
     template_name = 'emppage.html'
 
     def get(self, request):
-        manager_emp_id = request.user.emp_id
-        context = userservice.get_managed_employees(manager_emp_id)
+        context = userservice.get_managed_employees()
 
         if context is None:
             return render(request, self.template_name)
@@ -136,9 +179,12 @@ class ChangePassword(View):
         confirmpass = request.POST['confirmpassword']
         otp = request.POST['otp']
         sentotp = request.session.get('reset_otp')
+        email = request.session.get('reset_email')
 
-        success, message = userservice.change_password_service(sentotp, otp, newpass, confirmpass)
+        success, message = userservice.change_password_service(sentotp, otp, newpass, confirmpass, email)
         if success:
+            del request.session['reset_otp']
+            del request.session['reset_email']
             messages.success(request, message)
             return redirect('login')
         else:
@@ -153,7 +199,7 @@ class ChangePassword(View):
 class ProfileView(View):
     template_name = 'profile.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         email = request.user.email
         context = userservice.get_employee_profile(email)
         return render(request, self.template_name, context)
