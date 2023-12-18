@@ -22,7 +22,7 @@ class LoginView(View):
     def post(self, request):
         email = request.POST['username']
         password = request.POST['password']
-        redirect_url = userservice.user_authentication(request, email, password)
+        redirect_url = userservice.user_authentication(email, password)
 
         if redirect_url:
             return redirect(redirect_url)
@@ -42,7 +42,7 @@ class ForgotPassword(View):
 
     def post(self, request):
         email = request.POST['email']
-        redirect_url = userservice.forgot_password_service(request, email)
+        redirect_url = userservice.forgot_password_service(email)
         if redirect_url:
             return redirect(redirect_url)
         else:
@@ -67,7 +67,7 @@ class ResetPassword(View):
         newpass = request.POST['newpassword']
         confirmpass = request.POST['confirmpassword']
 
-        success, message = userservice.reset_password_service(request, oldpass, newpass, confirmpass)
+        success, message = userservice.reset_password_service(oldpass, newpass, confirmpass)
 
         if success:
             messages.success(request, message)
@@ -100,7 +100,7 @@ class RegisterView(View):
         ismanager = request.POST['ismanager']
 
         context = userservice.register_employee(
-            request, empid, fname, lname, email, doj, desig, dept, password, ismanager
+            empid, fname, lname, email, doj, desig, dept, password, ismanager
         )
 
         return render(request, self.template_name, context)
@@ -137,7 +137,7 @@ class ChangePassword(View):
         otp = request.POST['otp']
         sentotp = request.session.get('reset_otp')
 
-        success, message = userservice.change_password_service(request, sentotp, otp, newpass, confirmpass)
+        success, message = userservice.change_password_service(sentotp, otp, newpass, confirmpass)
         if success:
             messages.success(request, message)
             return redirect('login')

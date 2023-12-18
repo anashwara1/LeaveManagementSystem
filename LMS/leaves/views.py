@@ -36,7 +36,7 @@ class ApplyLeave(View):
         reason = request.POST['reason']
 
         applyleaveservice = ApplyLeaveService()
-        applyleaveservice.apply_leave_service(request, startdate, enddate, reason, leavetype)
+        applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype)
         return render(request, self.template_name)
 
     def get(self, request):
@@ -52,7 +52,7 @@ class LeaveHistory(View):
 
     def get(self, request):
         leavehistoryservice = LeaveHistoryService()
-        context = leavehistoryservice.leave_history_service(request)
+        context = leavehistoryservice.leave_history_service()
         return render(request, self.template_name, context)
 
 
