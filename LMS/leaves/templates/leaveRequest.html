@@ -35,7 +35,7 @@
     <tbody>
             {% for leave in leaves %}
             <tr data-reason="{{ leave.reason }}" data-balance="{{ leave.emp.balance }}" data-emp="{{ leave.leave_request_id }}" data-status="{{ leave.status }}">
-                <td>{{ leave.emp.firstname }} {{ leave.emp.lastname }}</td>
+                <td>{{ leave.emp.first_name }} {{ leave.emp.last_name }}</td>
                 <td>{{ leave.leavetypeid.leave_type_name }}</td>
                 <td>{{ leave.startdate }}</td>
                 <td>{{ leave.enddate }}</td>

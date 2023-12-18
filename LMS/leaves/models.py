@@ -7,8 +7,11 @@ from Users.models import Employees
 class Leavebalance(models.Model):
     balance_id = models.AutoField(db_column='Balance_ID', primary_key=True)  # Field name made lowercase.
     empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)  # Field name made lowercase.
-    leavetypeid = models.ForeignKey('LeaveTypes', models.DO_NOTHING, db_column='LeaveTypeID', blank=True, null=True)  # Field name made lowercase.
-    balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
+    leave_earned = models.FloatField(db_column='Leave_Earned', blank=True, null=True)
+    leave_consumed = models.FloatField(db_column='Leave_Consumed', blank=True, null=True)
+    carry_forward = models.FloatField(db_column='Carry_Forward', blank=True, null=True)
+    LOP = models.FloatField(db_column='LOP', blank=True, null=True)
+    comp_off = models.FloatField(db_column='Comp_Off', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -32,7 +35,6 @@ class LeaveRequest(models.Model):
 class LeaveTypes(models.Model):
     leave_type_id = models.AutoField(db_column='Leave_Type_ID', primary_key=True)  # Field name made lowercase.
     leave_type_name = models.CharField(db_column='Leave_Type_Name', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    max_leave_days = models.IntegerField(db_column='Max_Leave_Days', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True

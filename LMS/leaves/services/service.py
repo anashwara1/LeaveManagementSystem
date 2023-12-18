@@ -2,8 +2,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-
-from Users.models import Employees, Managers
+import numpy as np
+from Users.models import Employees
 from leaves.models import LeaveTypes, LeaveRequest
 
 
@@ -13,9 +13,9 @@ class ApplyLeaveService:
         leavetypes = LeaveTypes.objects.all().distinct()
         return leavetypes
 
-    def apply_leave_service(self, request, startdate, enddate, reason, leavetype):
+    def apply_leave_service(self, startdate, enddate, reason, leavetype, emp):
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
-        emp = Employees.objects.get(email=request.user.email)
+
         new_leave = LeaveRequest(
             startdate=startdate,
             enddate=enddate,
@@ -26,17 +26,16 @@ class ApplyLeaveService:
         )
 
         new_leave.save()
-        messages.success(request, 'Leave Request sent successfully.')
 
 
 class LeaveHistoryService:
-    def leave_history_service(self, request):
-        user = Employees.objects.get(email=request.user.email)
+    def leave_history_service(self, user):
         emp_leaves = LeaveRequest.objects.filter(emp=user.emp_id)
         context = {
             'leave_requests': emp_leaves,
         }
         return context
+
 
 class LeaveService:
     def get_leave(self, leave_id):
@@ -57,20 +56,19 @@ class LeaveService:
 
 
 class LeaveRequestService:
-    def get_leave_requests(self, user):
-        manager = Managers.objects.get(emp=user.emp_id)
-        emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+    def get_leave_requests(self):
+        emp_under_manager = Employees.objects.filter(is_staff=False)
         leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
         for leave in leaves:
-            leave.duration = (leave.enddate - leave.startdate).days + 1
+            leave.duration = np.busday_count(leave.enddate, leave.startdate) + 1
         return leaves
 
     def update_leave_status(self, leave_id, action):
         updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-        duration = (updated_leave.enddate - updated_leave.startdate).days + 1
+        duration = np.busday_count(updated_leave.enddate, updated_leave.startdate) + 1
         if action == 'accept':
             updated_leave.status = 'Accepted'
-            updated_leave.emp.balance -= duration
+            # updated_leave.emp.balance -= duration
             updated_leave.emp.save()
 
         else:
