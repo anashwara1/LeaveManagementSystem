@@ -10,13 +10,11 @@ from Users.models import *
 class UserService:
     def user_authentication(self, user):
 
-        if user is not None:
             if user.is_superuser:
                 return 'dashboard'
             else:
                 return 'emp_dashboard'
-        else:
-            return None
+
 
     def forgot_password_service(self, email):
         User = get_user_model()

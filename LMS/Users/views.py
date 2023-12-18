@@ -25,16 +25,12 @@ class LoginView(View):
         email = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
-        redirect_url = userservice.user_authentication(user)
 
         if user is not None:
-            if user.is_superuser:
-                login(request, user)
-            else:
-                login(request, user)
-
-        if redirect_url:
+            redirect_url = userservice.user_authentication(user)
+            login(request, user)
             return redirect(redirect_url)
+
         else:
             print("Invalid login attempt.")
             messages.error(request, "Invalid Credentials. Please check your username and password.")
