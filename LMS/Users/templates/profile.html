@@ -1,5 +1,5 @@
 {% load static %}
-{% if user.is_manager %}
+{% if user.is_superuser %}
     {% include 'admin_base.html' %}
 {% else %}
     {% include 'base.html' %}
@@ -34,7 +34,7 @@
             <div class="form-group row">
                 <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-name" value="{{ employee.firstname }} {{ employee.lastname }}" disabled>
+                    <input type="text" class="form-control" id="employee-name" value="{{ employee.first_name }} {{ employee.last_name }}" disabled>
                 </div>
             </div>
             <br>
@@ -48,7 +48,7 @@
             <div class="form-group row">
                 <label for="employee-department" class="col-md-3 col-form-label">Department:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-department"  value="{{employee.department.dep_name}}" disabled>
+                    <input type="text" class="form-control" id="employee-department"  value="{{employee.designation.dep.dep_name}}" disabled>
                 </div>
             </div>
             <br>
@@ -62,7 +62,7 @@
             <div class="form-group row">
                 <label for="employee-manager" class="col-md-3 col-form-label">Manager:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-manager" value="{{ employee.managed_by.emp.firstname }}" disabled>
+                    <input type="text" class="form-control" id="employee-manager" value="{{ employee.managed_by }}" disabled>
                 </div>
             </div>
             <br>

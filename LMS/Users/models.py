@@ -1,4 +1,3 @@
-from django.db import models
 
 # Create your models here.
 from django.db import models
@@ -44,8 +43,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
-        extra_fields.setdefault('is_manager', True)
-        extra_fields.setdefault('balance', 2)
 
         department, created = Department.objects.get_or_create(dep_name=department_name)
         designation, created = Designation.objects.get_or_create(designation=designation_name, dep=department)
@@ -59,50 +56,29 @@ class CustomUserManager(BaseUserManager):
         user.designation = designation
         user.save()
 
-        manager = Managers(emp=user)
-        manager.save()
-
         return user
-
 
 
 class Employees(AbstractUser, PermissionsMixin):
     username = None
     emp_id = models.CharField(db_column='Emp_ID', primary_key=True, max_length=10)  # Field name made lowercase.
-    firstname = models.CharField(db_column='FirstName', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    lastname = models.CharField(db_column='LastName', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    email = models.CharField(db_column='email', max_length=100, unique=True, default='anu@mail.com')  # Field name made lowercase.
     password = models.CharField(max_length=128, null=True, blank=True)
     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
-    department = models.ForeignKey(Department, models.DO_NOTHING, db_column='Department_id', blank=True, null=True)  # Field name made lowercase.
     designation = models.ForeignKey(Designation, models.DO_NOTHING, db_column='desig_id', blank=True, null=True)
     date_of_joining = models.DateField(db_column='Date_of_Joining', blank=True, null=True)  # Field name made lowercase.
-    managed_by = models.ForeignKey('Managers', models.DO_NOTHING, db_column='Managed_by', blank=True, null=True)  # Field name made lowercase.
-    is_active = models.BooleanField(default=True)  # Field name made lowercase.
+    manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='direct_reports')
     updated_at = models.DateTimeField(db_column='Updated_at', blank=True, null=True)  # Field name made lowercase.
-    created_at = models.DateTimeField(db_column='Created_at', blank=True, null=True)  # Field name made lowercase.
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-    balance = models.IntegerField(db_column='Balance', blank=True, null=True)  # Field name made lowercase.
-    is_manager = models.BooleanField(default=False)
+    email = models.EmailField(unique=True)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['emp_id', 'firstname', 'lastname', 'date_of_joining']
+    REQUIRED_FIELDS = ['emp_id', 'first_name', 'last_name', 'date_of_joining']
 
     def natural_key(self):
-        return (self.email,)
+        return self.email
 
     class Meta:
         managed = True
         db_table = 'Employees'
 
-
-class Managers(models.Model):
-    manager_id = models.AutoField(db_column='Manager_ID', primary_key=True)  # Field name made lowercase.
-    emp = models.ForeignKey(Employees, models.DO_NOTHING, db_column='EMP_ID', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = True
-        db_table = 'Managers'

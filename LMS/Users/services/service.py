@@ -12,7 +12,7 @@ class UserService:
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
-            if user.is_manager:
+            if user.is_superuser:
                 login(request, user)
                 return 'dashboard'
             else:
@@ -33,14 +33,13 @@ class UserService:
             return 'forgotpassword'
 
         otp = random.randint(1000, 9999)
-        fname = user.firstname
-        lname = user.lastname
+        fname = user.first_name
+        lname = user.last_name
         subject = 'Forgot Password OTP'
         otp_template = config('FORGOT_PASSWORD_OTP_TEMPLATE')
 
         otp_template = otp_template.replace('\\n', '\n')
-        message = otp_template.format(otp=otp, fname=fname,lname=lname)
-        # message = f'Change your password using this otp : {otp}'
+        message = otp_template.format(otp=otp, fname=fname, lname=lname)
         from_email = config('EMAIL_HOST_USER')
         recipient_list = [email]
 
@@ -85,20 +84,8 @@ class UserService:
     def get_employee_profile(self, email):
         try:
             employee = Employees.objects.get(email=email)
-            emp_id = employee.emp_id
-            firstname = employee.firstname
-            lastname = employee.lastname
-            department = employee.department
-            profile_image = employee.profile_image
-
-
             return {
-                'employee': employee,
-                'emp_id': emp_id,
-                'firstname': firstname,
-                'lastname': lastname,
-                'profile_image': profile_image,
-                'department': department,
+                'employee': employee
             }
 
         except Employees.DoesNotExist:
@@ -106,28 +93,24 @@ class UserService:
 
     def get_managed_employees(self, manager_emp_id):
         try:
-            manager_instance = Managers.objects.get(emp=manager_emp_id)
-            manager_id = manager_instance.manager_id
-        except Managers.DoesNotExist:
+            manager_instance = Employees.objects.filter(is_staff=False)
+        except Employees.DoesNotExist:
             return None
 
-        employees_managed = Employees.objects.filter(managed_by=manager_id)
         return {
-            'employees_managed': employees_managed,
-            'manager_id': manager_id,
+            'employees_managed': manager_instance,
         }
 
     def get_departments_and_managers(self):
         departments = Department.objects.values_list('dep_name', flat=True).distinct()
-        managers_id = Managers.objects.values_list('emp', flat=True).distinct()
-        managers = Employees.objects.filter(emp_id__in=managers_id).values_list('firstname', flat=True)
+        designations = Designation.objects.values_list('designation', flat=True).distinct()
 
         return {
             'departments': departments,
-            'managers': managers
+            'designations': designations,
         }
 
-    def register_employee(self, request, empid, fname, lname, email, doj, desig, dept, password, ismanager, manager):
+    def register_employee(self, request, empid, fname, lname, email, doj, desig, dept, password, ismanager):
         context = self.get_departments_and_managers()
 
         if len(empid) >= 10:
@@ -159,25 +142,17 @@ class UserService:
 
         new_user = Employees.objects.create_user(
             emp_id=empid,
-            firstname=fname,
-            lastname=lname,
+            first_name=fname,
+            last_name=lname,
             email=email,
             password=password,
             date_of_joining=doj,
             designation=desig_object,
-            balance=config('leave_initial'),
-            department=dept_object,
             profile_image=f"profile_images/{file_name}" if file_name else None
         )
 
         if ismanager == 'yes':
-            newmanager, created = Managers.objects.get_or_create(emp=new_user)
-            new_user.is_manager = 'True'
-
-        managerid = Employees.objects.get(firstname=manager)
-
-        new_user.managed_by = Managers.objects.get(emp=managerid.emp_id)
-        new_user.save()
+            new_user.is_staff = 'True'
 
         subject = 'Registration Confirmation'
         message_template = config('MESSAGE_TEMPLATE')

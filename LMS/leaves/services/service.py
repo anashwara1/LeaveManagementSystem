@@ -2,8 +2,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-
-from Users.models import Employees, Managers
+import numpy as np
+from Users.models import Employees
 from leaves.models import LeaveTypes, LeaveRequest
 
 
@@ -58,19 +58,18 @@ class LeaveService:
 
 class LeaveRequestService:
     def get_leave_requests(self, user):
-        manager = Managers.objects.get(emp=user.emp_id)
-        emp_under_manager = Employees.objects.filter(managed_by=manager.manager_id)
+        emp_under_manager = Employees.objects.filter(is_staff=False)
         leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
         for leave in leaves:
-            leave.duration = (leave.enddate - leave.startdate).days + 1
+            leave.duration = np.busday_count(leave.enddate, leave.startdate) + 1
         return leaves
 
     def update_leave_status(self, leave_id, action):
         updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-        duration = (updated_leave.enddate - updated_leave.startdate).days + 1
+        duration = np.busday_count(updated_leave.enddate, updated_leave.startdate) + 1
         if action == 'accept':
             updated_leave.status = 'Accepted'
-            updated_leave.emp.balance -= duration
+            # updated_leave.emp.balance -= duration
             updated_leave.emp.save()
 
         else:

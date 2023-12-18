@@ -12,6 +12,7 @@ from Users.services.service import UserService
 
 userservice = UserService()
 
+
 class LoginView(View):
     template_name = 'login.html'
 
@@ -83,7 +84,7 @@ class ResetPassword(View):
 class RegisterView(View):
     template_name = 'register.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         context = userservice.get_departments_and_managers()
         return render(request, self.template_name, context)
 
@@ -97,10 +98,9 @@ class RegisterView(View):
         dept = request.POST['dept']
         password = request.POST['password']
         ismanager = request.POST['ismanager']
-        manager = request.POST['manager']
 
         context = userservice.register_employee(
-            request, empid, fname, lname, email, doj, desig, dept, password, ismanager, manager
+            request, empid, fname, lname, email, doj, desig, dept, password, ismanager
         )
 
         return render(request, self.template_name, context)
@@ -117,15 +117,13 @@ class Dashboard(View):
 @method_decorator(login_required(login_url='/login'), name='dispatch')
 class EmployeePageView(View):
     template_name = 'emppage.html'
-    error_template_name = 'error_page.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         manager_emp_id = request.user.emp_id
-
         context = userservice.get_managed_employees(manager_emp_id)
 
         if context is None:
-            return render(request, self.error_template_name)
+            return render(request, self.template_name)
 
         return render(request, self.template_name, context)
 

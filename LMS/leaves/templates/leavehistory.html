@@ -1,5 +1,5 @@
 {% load static %}
-{% if user.is_manager %}
+{% if user.is_superuser %}
     {% include 'admin_base.html' %}
 {% else %}
     {% include 'base.html' %}

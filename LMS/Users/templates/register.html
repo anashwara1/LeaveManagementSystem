@@ -68,7 +68,11 @@
             <div class="form-group row">
                 <label for="employee-designation" class="col-md-3 col-form-label bold-label">Designation:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" id="employee-designation" name="desig" required>
+                    <select id="employee-designation" name="desig" onchange="showInput()">
+                                {% for desig in designations %}
+                                    <option value="{{ desig }}">{{ desig }}</option>
+                                {% endfor %}
+                            </select>
                 </div>
             </div>
             <br>
@@ -78,17 +82,6 @@
                     <input type="date" class="form-control" id="employee-doj" name="doj" max="{% now 'Y-m-d' %}"required>
                 </div>
             </div>
-            <br>
-            <div class="form-group row">
-                        <label for="manager" class="col-md-3 col-form-label bold-label">Manager:</label>
-                        <div class="col-md-9">
-                            <select id="manager" name="manager" onchange="showInput()">
-                                {% for manager in managers %}
-                                    <option value="{{ manager }}">{{ manager }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
             <br>
             <div class="form-group row">
                 <label for="is-manager" class="col-md-3 col-form-label bold-label">Is Manager</label>
