@@ -38,8 +38,8 @@ class ApplyLeave(View):
         emp = Employees.objects.get(email=request.user.email)
 
         applyleaveservice = ApplyLeaveService()
-        a = applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype, emp)
-        if a:
+        existing_leave_request = applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype, emp)
+        if existing_leave_request:
             messages.error(request, 'Leave for this day is already applied')
             return redirect('leavehistory')
         else:
