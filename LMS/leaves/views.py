@@ -38,8 +38,13 @@ class ApplyLeave(View):
         emp = Employees.objects.get(email=request.user.email)
 
         applyleaveservice = ApplyLeaveService()
-        applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype, emp)
-        messages.success(request, 'Leave Request sent successfully.')
+        a = applyleaveservice.apply_leave_service(startdate, enddate, reason, leavetype, emp)
+        if a:
+            messages.error(request, 'Leave for this day is already applied')
+            return redirect('leavehistory')
+        else:
+            messages.success(request, 'Leave Request sent successfully.')
+            return redirect('leavehistory')
         return render(request, self.template_name)
 
     def get(self, request):
@@ -76,7 +81,7 @@ class LeaveRequestView(View):
     def post(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)
         leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests(user)
+        leaves = leave_request_service.get_leave_requests()
 
         action = request.POST.get('action')
         leave_id = request.POST.get('empid')

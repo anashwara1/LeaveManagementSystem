@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib import messages
+from django.db.utils import IntegrityError
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 import numpy as np
@@ -15,17 +15,24 @@ class ApplyLeaveService:
 
     def apply_leave_service(self, startdate, enddate, reason, leavetype, emp):
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
+        try:
+            leave_requests = LeaveRequest.objects.filter(startdate__range=(startdate, enddate), enddate__range=(startdate,enddate))
+            if leave_requests.exists():
+                return True
+            else:
+                new_leave = LeaveRequest(
+                    startdate=startdate,
+                    enddate=enddate,
+                    reason=reason,
+                    leavetypeid=leaveTypeid_object,
+                    status='Pending',
+                    emp=emp
+                )
+                new_leave.save()
+                return False
 
-        new_leave = LeaveRequest(
-            startdate=startdate,
-            enddate=enddate,
-            reason=reason,
-            leavetypeid=leaveTypeid_object,
-            status='Pending',
-            emp=emp
-        )
-
-        new_leave.save()
+        except IntegrityError:
+            return False
 
 
 class LeaveHistoryService:

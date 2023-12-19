@@ -6,6 +6,15 @@
 {% endif %}
 
 {% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
 <div class="card">
   <div class="card-body">
 

@@ -10,10 +10,10 @@ from Users.models import *
 class UserService:
     def user_authentication(self, user):
 
-            if user.is_superuser:
-                return 'dashboard'
-            else:
-                return 'emp_dashboard'
+        if user.is_superuser:
+            return 'dashboard'
+        else:
+            return 'emp_dashboard'
 
 
     def forgot_password_service(self, email):
