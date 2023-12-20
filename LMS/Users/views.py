@@ -159,12 +159,30 @@ class EmployeePageView(View):
     template_name = 'emppage.html'
 
     def get(self, request):
-        context = userservice.get_managed_employees()
+        context = {
+            'employees_managed': userservice.get_managed_employees()['employees_managed'],
+            'departments': userservice.get_departments_and_managers()['departments'],
+            'designations': userservice.get_departments_and_managers()['designations'],
+        }
 
         if context is None:
             return render(request, self.template_name)
 
         return render(request, self.template_name, context)
+
+    def post(self, request):
+        empid = request.POST['empid']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        email = request.POST['email']
+        dep = request.POST['dept']
+        desig = request.POST['desig']
+        doj = request.POST['doj']
+        manager = request.POST['ismanager']
+        redirect_url = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+        messages.success(request, 'Employee details updated successfully')
+
+        return redirect(redirect_url)
 
 
 class ChangePassword(View):
@@ -207,3 +225,9 @@ class Logout(View):
     def get(self, request):
         logout(request)
         return render(request, self.template_name)
+
+
+class DeleteEmployee(View):
+    def post(self, request, emp_id, *args, **kwargs):
+        redirect_url = userservice.delete_employee(emp_id)
+        return redirect(redirect_url)

@@ -4,16 +4,18 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+
 from Users.models import *
 
 
 class UserService:
     def user_authentication(self, user):
 
-            if user.is_superuser:
-                return 'dashboard'
-            else:
-                return 'emp_dashboard'
+        if user.is_staff:
+            return 'dashboard'
+        else:
+            return 'emp_dashboard'
 
 
     def forgot_password_service(self, email):
@@ -74,7 +76,7 @@ class UserService:
 
     def get_managed_employees(self):
         try:
-            manager_instance = Employees.objects.filter(is_staff=False)
+            manager_instance = Employees.objects.filter(is_superuser=False, is_active=True)
         except Employees.DoesNotExist:
             return None
 
@@ -128,6 +130,7 @@ class UserService:
 
         if ismanager == 'yes':
             new_user.is_staff = 'True'
+            new_user.save()
 
         subject = 'Registration Confirmation'
         message_template = config('MESSAGE_TEMPLATE')
@@ -141,3 +144,27 @@ class UserService:
         send_mail(subject, message, from_email, recipient_list)
 
         return context
+
+    def update_user(self, empid, fname, lname, email, dep, desig, doj, manager):
+        user = Employees.objects.get(emp_id=empid)
+        user.first_name = fname
+        user.last_name = lname
+        user.email = email
+        dept_object, created = Department.objects.get_or_create(dep_name=dep)
+        desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+        user.designation = desig_object
+        user.date_of_joining = doj
+        if manager == 'yes':
+            user.is_staff = True
+
+        elif manager == 'no':
+            user.is_staff = False
+
+        user.save()
+        return 'employees'
+
+    def delete_employee(self, employee_id):
+        employee = get_object_or_404(Employees, emp_id=employee_id)
+        employee.is_active = False
+        employee.save()
+        return 'employees'
