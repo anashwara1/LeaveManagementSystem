@@ -159,10 +159,17 @@ class EmployeePageView(View):
     template_name = 'emppage.html'
 
     def get(self, request):
+        service_data = userservice.get_managed_employees()
+        employees_managed = service_data['employees_managed']
+
+        departments_and_designations = userservice.get_departments_and_managers()
+        departments = departments_and_designations['departments']
+        designations = departments_and_designations['designations']
+
         context = {
-            'employees_managed': userservice.get_managed_employees()['employees_managed'],
-            'departments': userservice.get_departments_and_managers()['departments'],
-            'designations': userservice.get_departments_and_managers()['designations'],
+            'employees_managed': employees_managed,
+            'departments': departments,
+            'designations': designations,
         }
 
         if context is None:
