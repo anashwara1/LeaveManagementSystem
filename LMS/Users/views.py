@@ -189,7 +189,7 @@ class EmployeePageView(View):
             desig = request.POST['desig']
             doj = request.POST['doj']
             manager = request.POST['ismanager']
-            redirect_url = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+            redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
 
         else:
             employee_id = request.POST['emp-id']
@@ -197,9 +197,9 @@ class EmployeePageView(View):
             enddate = request.POST['enddate']
             lopdays = request.POST['noofdays']
             remarks = request.POST['remarks']
-            redirect_url = userservice.lop(startdate, enddate, lopdays, employee_id, remarks)
+            redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
 
-        messages.success(request, 'Employee details updated successfully')
+        messages.success(request, message)
 
         return redirect(redirect_url)
 
