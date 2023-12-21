@@ -1,14 +1,26 @@
-
-
 {% extends 'admin_base.html' %}
+{% load static %}
 
 {% block title %}Employees{% endblock %}
+  {% block additional_head %}
+
+
+<script type="text/javascript" src="{% static 'js/edituser.js' %}"> </script>
+
+{% endblock %}
 
 {% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 <div class="card">
     <h2>Employees</h2>
     <br>
-  <table class="table table-striped" id="details">
+  <table id="details">
       <thead>
         <tr>
           <th>Sl No.</th>
@@ -17,17 +29,24 @@
           <th>Designation</th>
           <th>DOJ</th>
           <th>Leave Balance</th>
+            <th>Action</th>
         </tr>
       </thead>
        <tbody>
         {% for employee in employees_managed %}
-          <tr>
+          <tr data-mail="{{ employee.email }}" data-fname="{{ employee.first_name }}" data-lname="{{ employee.last_name }}" data-dep="{{ employee.designation.dep.dep_name }}">
             <td>{{ forloop.counter }}</td>
             <td>{{ employee.emp_id }}</td>
             <td>{{ employee.first_name }} {{ employee.last_name }}</td>
             <td>{{ employee.designation.designation }}</td>
             <td>{{ employee.date_of_joining }}</td>
             <td>{{ employee.balance}}</td>
+              <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Leavedetails">Edit</button>
+                  <form method="post" action="{% url 'delete_employee' emp_id=employee.emp_id %}" data-emp-id="{{ employee.emp_id }}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+              </td>
           </tr>
 
         {% endfor %}
@@ -36,12 +55,126 @@
 
 
 </table>
+    <div class="modal fade" id="Leavedetails" tabindex="-1" aria-labelledby="LeavedetailsLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="container-fluid h-100">
+<div class="card-body">
+<div class="container">
+
+            <div class="form-group row">
+                <label for="employee-name" class="col-md-3 col-form-label">Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-name" disabled>
+                </div>
+            </div>
+            <br>
+
+
+            <div class="card">
+ <div class="card-header text-center">
+    Edit User
+  </div>
+<br>
+
+<form action="{% url 'employees' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+            <div class="form-group row">
+                <label for="employee-id" class="col-md-3 col-form-label bold-label">Emp ID:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-id" disabled >
+                    <input type="hidden" name="empid" id="empid">
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-firstname" class="col-md-3 col-form-label bold-label">First Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-firstname" name="fname">
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-lastname" class="col-md-3 col-form-label bold-label">Last Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="employee-lastname" name="lname">
+                </div>
+            </div>
+            <br>
+             <div class="form-group row">
+                <label for="employee-mail" class="col-md-3 col-form-label bold-label">Email ID:</label>
+                <div class="col-md-9">
+                    <input type="email" class="form-control" id="employee-mail" name="email">
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-department" class="col-md-3 col-form-label bold-label">Department:</label>
+                <div class="col-md-9">
+                     <select id="employee-department" name="dept" onchange="showInput()">
+                        {% for department in departments %}
+                            <option value="{{ department }}">{{ department }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-designation" class="col-md-3 col-form-label bold-label">Designation:</label>
+                <div class="col-md-9">
+                    <select id="employee-designation" name="desig" onchange="showInput()">
+                                {% for desig in designations %}
+                                    <option value="{{ desig }}">{{ desig }}</option>
+                                {% endfor %}
+                            </select>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="employee-doj" class="col-md-3 col-form-label bold-label">Date of Joining:</label>
+                <div class="col-md-9">
+                    <input type="date" class="form-control" id="employee-doj" name="doj" max="{% now 'Y-m-d' %}">
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="is-manager" class="col-md-6 col-form-label bold-label"></label>
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="is-manager-yes" name="ismanager" value="yes" >
+                        <label class="form-check-label" for="is-manager-yes">Make Manager</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="is-manager-no" name="ismanager" value="no">
+                        <label class="form-check-label" for="is-manager-no">Remove as Manager</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="is-manager-aa" name="ismanager" value="aa" checked>
+                        <label class="form-check-label" for="is-manager-aa">No change</label>
+                    </div>
+                </div>
+            </div>
+            <br>
+<!--            <div class="form-group row">-->
+<!--                <label for="employee-image" class="col-md-3 col-form-label bold-label">Employee Image:</label>-->
+<!--                <div class="col-md-9">-->
+<!--                     <input type="file" class="form-control-file" id="employee-image" name="employee_image" accept="image/*">-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--    <br>-->
+                    <button type="submit" class="btn btn-success">Submit</button>
+        </form>
 </div>
-<script>
-        $(document).ready(function() {
-            $('#details').DataTable();
-        });
-    </script>
+            </div></div>
+</div>
+
+        </div>
+            </div>
+        </div>
+
+</div>
+
 {% endblock %}
 
 

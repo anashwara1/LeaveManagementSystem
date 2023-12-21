@@ -18,5 +18,6 @@ urlpatterns = [
     path('reset_password/', ResetPassword.as_view(), name='resetpassword'),
     path('logout/', Logout.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
+    path('delete_employee/<str:emp_id>/', DeleteEmployee.as_view(), name='delete_employee'),
 
 ]
