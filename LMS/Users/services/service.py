@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
 from Users.models import *
-
+from leaves.models import *
 
 class UserService:
     def user_authentication(self, user):
@@ -167,4 +167,18 @@ class UserService:
         employee = get_object_or_404(Employees, emp_id=employee_id)
         employee.is_active = False
         employee.save()
+        return 'employees'
+
+    def lop(self, startdate, enddate, lopdays, empid, remarks):
+        user = Employees.objects.get(emp_id=empid)
+        employee_lop, created = LossOfPay.objects.get_or_create(empid=user)
+        employee_lop.start_date = startdate
+        employee_lop.end_date = enddate
+        employee_lop.remarks = remarks
+
+        if employee_lop.lop is None:
+            employee_lop.lop = 0
+        employee_lop.lop += float(lopdays)
+        employee_lop.save()
+
         return 'employees'

@@ -16,7 +16,7 @@ class ApplyLeaveService:
     def apply_leave_service(self, startdate, enddate, reason, leavetype, emp):
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
         try:
-            leave_requests = LeaveRequest.objects.filter(startdate__range=(startdate, enddate), enddate__range=(startdate,enddate))
+            leave_requests = LeaveRequest.objects.filter(startdate__range=(startdate, enddate), enddate__range=(startdate, enddate), emp=emp.emp_id)
             if leave_requests.exists():
                 return True
             else:
@@ -25,9 +25,13 @@ class ApplyLeaveService:
                     enddate=enddate,
                     reason=reason,
                     leavetypeid=leaveTypeid_object,
-                    status='Pending',
                     emp=emp
                 )
+
+                if emp.is_superuser:
+                    new_leave.status = 'Accepted'
+                else:
+                    new_leave.status = 'Pending'
                 new_leave.save()
                 return False
 
