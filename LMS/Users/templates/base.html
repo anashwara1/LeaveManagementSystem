@@ -29,6 +29,8 @@
           <a class="nav-link {% if request.path == '/emp_dashboard/' %}active{% endif %}" href="{% url 'emp_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
           <a class="nav-link {% if request.path == '/applyleave/' %}active{% endif %}" href="{% url 'applyleave' %}"><i class="fas fa-calendar-plus"></i> Apply Leave</a>
           <a class="nav-link {% if request.path == '/leavehistory/' %}active{% endif %}" href="{% url 'leavehistory' %}"><i class="fas fa-history"></i> Leave History</a>
+            <a class="nav-link {% if request.path == '/holidays/' %}active{% endif %}" href="{% url 'holidays' %}"><i class="fas fa-user-plus"></i> Holidays</a>
+
         </div>
         </div>
         <div class="navbar-nav ml-auto">

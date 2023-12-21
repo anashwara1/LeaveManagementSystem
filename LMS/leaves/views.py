@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
-
+from django.views.generic import TemplateView
+from leaves.models import *
 from Users.models import Employees
-from leaves.services.service import LeaveService, ApplyLeaveService, LeaveHistoryService, LeaveRequestService
+from leaves.services.service import *
 
 
 class EditLeaveView(View):
@@ -18,6 +19,7 @@ class EditLeaveView(View):
         leave_service = LeaveService()
         leave_service.edit_leave(leave_id, leavetype, startdate, enddate, reason)
         return redirect('leavehistory')
+
 
 class DeleteLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
@@ -45,7 +47,6 @@ class ApplyLeave(View):
         else:
             messages.success(request, 'Leave Request sent successfully.')
             return redirect('leavehistory')
-        return render(request, self.template_name)
 
     def get(self, request):
         applyleaveservice = ApplyLeaveService()
@@ -86,6 +87,25 @@ class LeaveRequestView(View):
         action = request.POST.get('action')
         leave_id = request.POST.get('empid')
 
-        leave_request_service.update_leave_status(leave_id, action)
+        message = leave_request_service.update_leave_status(leave_id, action)
 
         return redirect('leaveRequest')
+
+
+class Holiday(View):
+    template_name = 'holidays.html'
+
+    def get(self, request):
+        holidays = Holidays.objects.all()
+        context = {
+            'holidays': holidays
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        hname = request.POST['name']
+        hdate = request.POST['date']
+        holiday_service = HolidayService()
+        redirect_url = holiday_service.new_holiday(hname, hdate)
+        return redirect(redirect_url)

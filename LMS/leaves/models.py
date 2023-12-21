@@ -40,3 +40,13 @@ class LeaveTypes(models.Model):
         managed = True
         db_table = 'Leave_Types'
 
+
+class Holidays(models.Model):
+    holiday_id = models.AutoField(db_column='Holiday_ID', primary_key=True)
+    holiday_name = models.CharField(db_column='Holiday', max_length=100, blank=True, null=True)
+    date = models.DateField(db_column='Date', blank=True, null=True)
+    day = models.CharField(db_column='Day', max_length=10, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'Holidays'
