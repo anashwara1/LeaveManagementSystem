@@ -50,4 +50,141 @@
 <!--      </div>-->
 <!--    </div>-->
 <!--  </div>-->
+<!--      <div class="card">-->
+<!--     <h2>Yearly Report for {{ year }}</h2>-->
+
+<!--  <table id="details">-->
+<!--    <thead>-->
+<!--      <tr>-->
+<!--        <th>Name</th>-->
+<!--        <th>Start Date</th>-->
+<!--        <th>End Date</th>-->
+<!--        <th>Reason</th>-->
+<!--        <th>Number of Days</th>-->
+<!--        <th>Month</th>-->
+<!--      </tr>-->
+<!--    </thead>-->
+<!--    <tbody>-->
+<!--      {% for data in yearly_data %}-->
+<!--        <tr>-->
+<!--          <td>{{ data.employee_name }}</td>-->
+<!--          <td>{{ data.start_date }}</td>-->
+<!--          <td>{{ data.end_date }}</td>-->
+<!--          <td>{{ data.reason }}</td>-->
+<!--          <td>{{ data.num_of_days }}</td>-->
+<!--          <td>{{ data.month }}</td>-->
+<!--        </tr>-->
+<!--      {% endfor %}-->
+<!--    </tbody>-->
+<!--  </table>-->
+<!--     </div>-->
+<!--    <script>-->
+<!--        $(document).ready(function() {-->
+<!--    var table = $('#details').DataTable({-->
+<!--        dom: 'Bfrtip',-->
+<!--        buttons: [-->
+<!--            'copy', 'csv', 'excel', 'pdf', 'print'-->
+<!--        ]-->
+<!--        });-->
+
+<!--    </script>-->
+    <div class="card" >
+    <h2>Leave Report </h2>
+    <br>
+ <div class="table-responsive">
+  <table class="table table-striped"  id="details" >
+       <thead >
+             <tr>
+                <th>Ecode</th>
+                <th>Name of Employee</th>
+                <th>DOJ</th>
+                <th>L Bal</th>
+                <th>L Ernd</th>
+                <th>L Cnsmd</th>
+                <th>Comp_off</th>
+                <th>LOP</th>
+                <!-- Add columns for each month -->
+                <th>LE.JAN</th>
+                <th>LC.JAN</th>
+                <th>LE.FEB</th>
+                <th>LC.FEB</th>
+                <th>LE.MAR</th>
+                <th>LC.MAR</th>
+                <th>LE.APR</th>
+                <th>LC.APR</th>
+                <th>LE.MAY</th>
+                <th>LC.MAY</th>
+                <th>LE.JUN</th>
+                <th>LC.JUN</th>
+                <th>LE.JUL</th>
+                <th>LC.JUL</th>
+                <th>LE.AUG</th>
+                <th>LC.AUG</th>
+                <th>LE.SEP</th>
+                <th>LC.SEP</th>
+                <th>LE.OCT</th>
+                <th>LC.OCT</th>
+                <th>LE.NOV</th>
+                <th>LC.NOV</th>
+                <th>LE.DEC</th>
+                <th>LC.DEC</th>
+            </tr>
+    </thead>
+    <tbody>
+        {% for employee_data in yearly_data %}
+                <tr>
+                    <td>{{ employee_data.Ecode }}</td>
+                    <td>{{ employee_data.Name_of_Employee }}</td>
+                    <td>{{ employee_data.DOJ }}</td>
+                    <td>{{ employee_data.L_Bal }}</td>
+                    <td>{{ employee_data.L_Ernd }}</td>
+                    <td>{{ employee_data.L_Cnsmd }}</td>
+                    <td>{{ employee_data.Comp_off }}</td>
+                    <td>{{ employee_data.LOP }}</td>
+                    <!-- Add cells for each month -->
+                    <td>{{ employee_data.LE_JAN }}</td>
+                    <td>{{ employee_data.LC_JAN }}</td>
+                    <td>{{ employee_data.LE_FEB }}</td>
+                    <td>{{ employee_data.LC_FEB }}</td>
+                    <td>{{ employee_data.LE_MAR }}</td>
+                    <td>{{ employee_data.LC_MAR }}</td>
+                    <td>{{ employee_data.LE_APR }}</td>
+                    <td>{{ employee_data.LC_APR }}</td>
+                    <td>{{ employee_data.LE_MAY }}</td>
+                    <td>{{ employee_data.LC_MAY }}</td>
+                    <td>{{ employee_data.LE_JUN }}</td>
+                    <td>{{ employee_data.LC_JUN }}</td>
+                    <td>{{ employee_data.LE_JUL }}</td>
+                    <td>{{ employee_data.LC_JUL }}</td>
+                    <td>{{ employee_data.LE_AUG }}</td>
+                    <td>{{ employee_data.LC_AUG }}</td>
+                    <td>{{ employee_data.LE_SEP }}</td>
+                    <td>{{ employee_data.LC_SEP }}</td>
+                    <td>{{ employee_data.LE_OCT }}</td>
+                    <td>{{ employee_data.LC_OCT }}</td>
+                    <td>{{ employee_data.LE_NOV }}</td>
+                    <td>{{ employee_data.LC_NOV }}</td>
+                    <td>{{ employee_data.LE_DEC }}</td>
+                    <td>{{ employee_data.LC_DEC }}</td>
+                </tr>
+            {% endfor %}
+    </tbody>
+  </table>
+        </div>
+    </div>
+
+
+</div>
+      <script>
+    $(document).ready(function() {
+        $('#details').DataTable({
+            scrollX: true,
+            scrollCollapse: false,
+            fixedColumns: {
+                leftColumns: 8, // Set the number of columns that should be fixed (non-scrollable) on the left
+            }
+        });
+    });
+</script>
+
 {% endblock %}

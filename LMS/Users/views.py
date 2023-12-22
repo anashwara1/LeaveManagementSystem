@@ -2,11 +2,13 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.utils.datetime_safe import datetime
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 
 from Users.models import Employees
+from leaves.models import Leavebalance, LeaveRequest
 from Users.services.service import UserService
 
 # Create your views here.
@@ -153,6 +155,72 @@ class Dashboard(View):
     def get(self, request):
         return render(request, self.template_name)
 
+    def get(self, request, *args, **kwargs):
+        all_employees = Employees.objects.all()
+        yearly_data = self.get_yearly_leave_data(all_employees)
+
+        context = {
+            'yearly_data': yearly_data,
+        }
+        return render(request, self.template_name, context)
+
+    def get_yearly_leave_data(self, Employees):
+        yearly_data = []
+
+        for employee in Employees:
+            try:
+                leave_balance = Leavebalance.objects.get(empid=employee.emp_id)
+            except Leavebalance.DoesNotExist:
+                # Handle the case where a matching record is not found
+                # You can log a message, raise an exception, or take other appropriate actions.
+                # For now, we will skip this employee and continue with the next one.
+                continue
+
+            # Get leave balance values with default of 0
+            leave_earned = leave_balance.leave_earned or 0
+            leave_consumed = leave_balance.leave_consumed or 0
+            LOP = leave_balance.LOP or 0
+            comp_off = leave_balance.comp_off or 0
+
+            employee_data = {
+                'Ecode': employee.emp_id,
+                'Name_of_Employee': employee.get_full_name(),
+                'DOJ': employee.date_of_joining,
+                'L_Ernd': leave_earned,
+                'L_Cnsmd': leave_consumed,
+                'LOP': LOP,
+                'Comp_off': comp_off,
+            }
+
+            # Calculate L_Bal based on the provided formula
+            employee_data['L_Bal'] = (
+                    leave_earned - leave_consumed + LOP - comp_off
+            )
+
+            # Get all leave requests for the employee
+            leave_requests = LeaveRequest.objects.filter(emp=employee)
+
+            # Initialize LE to 2 for each month after the date of joining
+            for month in range(employee.date_of_joining.month, 13):
+                start_month = datetime.strptime(str(month), "%m").strftime("%b").upper()
+                employee_data.setdefault(f'LE_{start_month}', 2.0)
+
+            # Dynamically fetch LC for each month based on accepted leave requests
+            for leave_request in leave_requests.filter(status='accepted'):
+                start_month = leave_request.startdate.strftime("%b").upper()
+
+                # Calculate LC based on accepted leave request duration
+                leave_duration = (leave_request.enddate - leave_request.startdate).days + 1
+
+                # Ensure LC field is initialized for each month
+                employee_data.setdefault(f'LC_{start_month}', 0.0)
+                employee_data[f'LC_{start_month}'] += leave_duration  # Assuming 1 day for leave consumed
+
+            yearly_data.append(employee_data)
+            # print(yearly_data)
+
+        return yearly_data
+
 
 @method_decorator(login_required(login_url='/login'), name='dispatch')
 class EmployeePageView(View):
@@ -238,3 +306,4 @@ class DeleteEmployee(View):
     def post(self, request, emp_id, *args, **kwargs):
         redirect_url = userservice.delete_employee(emp_id)
         return redirect(redirect_url)
+
