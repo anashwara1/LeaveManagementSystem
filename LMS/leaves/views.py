@@ -71,13 +71,17 @@ class LeaveRequestView(View):
     template_name = 'leaveRequest.html'
 
     def get(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
-        context = {
-            'leaves': leaves
-        }
-        return render(request, self.template_name, context)
+        try:
+            leave_request_service = LeaveRequestService()
+            leaves = leave_request_service.get_leave_requests()
+            context = {
+                'leaves': leaves
+            }
+            return render(request, self.template_name, context)
+
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
     def post(self, request, *args, **kwargs):
         user = Employees.objects.get(email=request.user.email)
@@ -110,6 +114,17 @@ class Holiday(View):
     def post(self, request):
         hname = request.POST['name']
         hdate = request.POST['date']
-        holiday_service = HolidayService()
-        redirect_url, message = holiday_service.new_holiday(hname, hdate)
-        return redirect(redirect_url)
+        try:
+            holiday_service = HolidayService()
+            redirect_url, message = holiday_service.new_holiday(hname, hdate)
+            messages.success(request, message)
+            return redirect(redirect_url)
+
+        except Exception as e:
+            print("Exception:", e)
+            messages.error(request, e)
+            return redirect('errorpage')
+
+
+class ErrorPageView(TemplateView):
+    template_name = 'errorpage.html'

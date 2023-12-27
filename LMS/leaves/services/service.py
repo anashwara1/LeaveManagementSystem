@@ -87,11 +87,11 @@ class LeaveRequestService:
 
             return leaves
 
-        except (Employees.DoesNotExist, LeaveRequest.DoesNotExist):
-            return None
+        except (Employees.DoesNotExist, LeaveRequest.DoesNotExist) as e:
+            raise e
 
-        except e:
-            return None
+        except Exception as e:
+            raise e
 
     def update_leave_status(self, leave_id, action):
         try:
@@ -145,5 +145,6 @@ class HolidayService:
             holidays.save()
             return 'holidays', 'Successfully added new holiday'
 
-        except e:
-            return 'holidays', 'Could not add new holiday'
+        except Exception as e:
+            raise e
+
