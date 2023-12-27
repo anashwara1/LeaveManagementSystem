@@ -72,20 +72,19 @@ class LeaveRequestService:
         try:
             emp_under_manager = Employees.objects.filter(is_staff=False)
             leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
-            try:
-                holidays = Holidays.objects.all()
-                holidays_array = []
-                for holiday in holidays:
-                    holidays_array.append(holiday.date)
-                    print(holidays_array)
 
-            except Holidays.DoesNotExist:
-                holidays_array = []
-
+            holidays = Holidays.objects.all()
+            holidays_array = []
+            for holiday in holidays:
+                holidays_array.append(holiday.date)
+                print(holidays_array)
             for leave in leaves:
-                leave.duration = np.busday_count(leave.startdate, leave.enddate, weekmask='1111100', holidays=holidays_array) + 1
-
+                leave.duration = np.busday_count(leave.startdate, leave.enddate, weekmask='1111100',
+                                                 holidays=holidays_array) + 1
             return leaves
+
+        except Holidays.DoesNotExist as e:
+            raise e
 
         except (Employees.DoesNotExist, LeaveRequest.DoesNotExist) as e:
             raise e
@@ -96,40 +95,45 @@ class LeaveRequestService:
     def update_leave_status(self, leave_id, action):
         try:
             updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-        except LeaveRequest.DoesNotExist:
-            print('Leave is not found')
-
-        try:
             holidays = Holidays.objects.all()
             holidays_array = []
             for holiday in holidays:
                 holidays_array.append(holiday.date)
-                print(holidays_array)
 
-        except Holidays.DoesNotExist:
-            holidays_array = []
+            duration = np.busday_count(updated_leave.startdate, updated_leave.enddate, weekmask='1111100',
+                                       holidays=holidays_array) + 1
+            leave_consumed, created = Leavebalance.objects.get_or_create(empid=updated_leave.emp)
+            if leave_consumed.leave_consumed is None:
+                leave_consumed.leave_consumed = 0
+            if action == 'accept':
+                updated_leave.status = 'Approved'
+                leave_consumed.leave_consumed += duration
+                leave_consumed.save()
 
-        duration = np.busday_count(updated_leave.startdate, updated_leave.enddate, weekmask='1111100', holidays=holidays_array) + 1
-        leave_consumed, created = Leavebalance.objects.get_or_create(empid=updated_leave.emp)
-        if leave_consumed.leave_consumed is None:
-            leave_consumed.leave_consumed = 0
-        if action == 'accept':
-            updated_leave.status = 'Approved'
-            leave_consumed.leave_consumed += duration
-            leave_consumed.save()
+            else:
+                updated_leave.status = 'Rejected'
 
-        else:
-            updated_leave.status = 'Rejected'
+            updated_leave.save()
 
-        updated_leave.save()
+            email = Employees.objects.get(email=updated_leave.emp.email)
+            subject = f'LEAVE REQUEST {action.upper()}ED'
+            message = f'The leave request you have sent has been {action}ed'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email.email]
 
-        email = Employees.objects.get(email=updated_leave.emp.email)
-        subject = f'LEAVE REQUEST {action.upper()}ED'
-        message = f'The leave request you have sent has been {action}ed'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email.email]
+            send_mail(subject, message, from_email, recipient_list)
 
-        send_mail(subject, message, from_email, recipient_list)
+        except LeaveRequest.DoesNotExist as e:
+            raise e
+
+        except Holidays.DoesNotExist as e:
+            raise e
+
+        except Leavebalance.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e
 
 
 class HolidayService:

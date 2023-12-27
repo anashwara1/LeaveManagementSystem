@@ -50,6 +50,7 @@ class Holidays(models.Model):
         managed = True
         db_table = 'Holidays'
 
+
 class LossOfPay(models.Model):
     lop_id = models.AutoField(db_column='Lop_ID', primary_key=True)
     empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)

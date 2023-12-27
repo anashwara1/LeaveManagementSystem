@@ -84,16 +84,16 @@ class LeaveRequestView(View):
             return redirect('errorpage')
 
     def post(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
 
         action = request.POST.get('action')
         leave_id = request.POST.get('empid')
+        try:
+            message = leave_request_service.update_leave_status(leave_id, action)
+            return redirect('leaveRequest')
 
-        message = leave_request_service.update_leave_status(leave_id, action)
-
-        return redirect('leaveRequest')
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
 
 class Holiday(View):
