@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from Users.models import *
 from leaves.models import *
 
+
 class UserService:
     def user_authentication(self, user):
 
@@ -67,12 +68,17 @@ class UserService:
     def get_employee_profile(self, email):
         try:
             employee = Employees.objects.get(email=email)
+            balance = self.calculate_balance(employee)
             return {
-                'employee': employee
+                'employee': employee,
+                'balance': balance
             }
 
-        except Employees.DoesNotExist:
-            return {'error': 'Employee not found'}
+        except Employees.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e
 
     def get_managed_employees(self):
         try:
@@ -148,24 +154,27 @@ class UserService:
     def update_user(self, empid, fname, lname, email, dep, desig, doj, manager):
         try:
             user = Employees.objects.get(emp_id=empid)
-        except Employees.DoesNotExist:
-            return 'employees', 'Employee not found'
+            user.first_name = fname
+            user.last_name = lname
+            user.email = email
+            dept_object, created = Department.objects.get_or_create(dep_name=dep)
+            desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
+            user.designation = desig_object
+            user.date_of_joining = doj
+            if manager == 'yes':
+                user.is_staff = True
 
-        user.first_name = fname
-        user.last_name = lname
-        user.email = email
-        dept_object, created = Department.objects.get_or_create(dep_name=dep)
-        desig_object, created = Designation.objects.get_or_create(designation=desig, dep=dept_object)
-        user.designation = desig_object
-        user.date_of_joining = doj
-        if manager == 'yes':
-            user.is_staff = True
+            elif manager == 'no':
+                user.is_staff = False
 
-        elif manager == 'no':
-            user.is_staff = False
+            user.save()
+            return 'employees', 'Employee details updated successfully'
 
-        user.save()
-        return 'employees', 'Employee details updated successfully'
+        except Employees.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e
 
     def delete_employee(self, employee_id):
         employee = get_object_or_404(Employees, emp_id=employee_id)
@@ -176,18 +185,51 @@ class UserService:
     def lossofpay(self, startdate, enddate, lopdays, empid, remarks):
         try:
             user = Employees.objects.get(emp_id=empid)
-        except Employees.DoesNotExist:
-            return 'employees', 'Employee not found'
+            employee_lop, created = LossOfPay.objects.get_or_create(empid=user)
+            employee_lop.start_date = startdate
+            employee_lop.end_date = enddate
+            employee_lop.remarks = remarks
 
-        employee_lop, created = LossOfPay.objects.get_or_create(empid=user)
-        employee_lop.start_date = startdate
-        employee_lop.end_date = enddate
-        employee_lop.remarks = remarks
+            if employee_lop.lop is None:
+                employee_lop.lop = 0
+            employee_lop.lop += float(lopdays)
+            employee_lop.save()
 
-        if employee_lop.lop is None:
-            employee_lop.lop = 0
-        employee_lop.lop += float(lopdays)
-        employee_lop.save()
+            return 'employees', 'LOP is added'
 
-        return 'employees', 'LOP is added'
+        except (Employees.DoesNotExist, LossOfPay.DoesNotExist) as e:
+            raise e
 
+        except Exception as e:
+            raise e
+
+    def calculate_lop(self, user):
+        try:
+            lop_of_user = LossOfPay.objects.filter(empid=user)
+            lop = 0
+
+            for lossofpay in lop_of_user:
+                lop += lossofpay.lop
+
+            return lop
+
+        except LossOfPay.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e
+
+    def calculate_balance(self, user):
+        lop = self.calculate_lop(user)
+        try:
+            balance_parameters = Leavebalance.objects.get(empid=user)
+            balance = (balance_parameters.leave_earned - balance_parameters.leave_consumed +
+                       lop - balance_parameters.comp_off)
+
+            return balance
+
+        except Leavebalance.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e

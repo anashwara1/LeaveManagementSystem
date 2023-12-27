@@ -189,7 +189,13 @@ class EmployeePageView(View):
             desig = request.POST['desig']
             doj = request.POST['doj']
             manager = request.POST['ismanager']
-            redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+            try:
+                redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+
+            except Exception as e:
+                print("Exception:", e)
+                messages.error(request, e)
+                return redirect('errorpage')
 
         else:
             employee_id = request.POST['emp-id']
@@ -197,10 +203,15 @@ class EmployeePageView(View):
             enddate = request.POST['enddate']
             lopdays = request.POST['noofdays']
             remarks = request.POST['remarks']
-            redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
+            try:
+                redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
+
+            except Exception as e:
+                print("Exception:", e)
+                messages.error(request, e)
+                return redirect('errorpage')
 
         messages.success(request, message)
-
         return redirect(redirect_url)
 
 
@@ -233,9 +244,15 @@ class ProfileView(View):
     template_name = 'profile.html'
 
     def get(self, request):
-        email = request.user.email
-        context = userservice.get_employee_profile(email)
-        return render(request, self.template_name, context)
+        try:
+            email = request.user.email
+            context = userservice.get_employee_profile(email)
+            return render(request, self.template_name, context)
+
+        except Exception as e:
+            print("Exception:", e)
+            messages.error(request, e)
+            return redirect('errorpage')
 
 
 class Logout(View):

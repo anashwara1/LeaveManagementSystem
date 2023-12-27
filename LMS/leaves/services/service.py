@@ -3,8 +3,8 @@ from django.db.utils import IntegrityError
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 import numpy as np
-from Users.models import Employees
-from leaves.models import LeaveTypes, LeaveRequest
+from Users.models import *
+from leaves.models import *
 
 
 class ApplyLeaveService:
