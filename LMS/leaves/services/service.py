@@ -69,21 +69,29 @@ class LeaveService:
 
 class LeaveRequestService:
     def get_leave_requests(self):
-        emp_under_manager = Employees.objects.filter(is_staff=False)
-        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
         try:
-            holidays = Holidays.objects.all()
-            holidays_array = []
-            for holiday in holidays:
-                holidays_array.append(holiday.date)
-                print(holidays_array)
+            emp_under_manager = Employees.objects.filter(is_staff=False)
+            leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+            try:
+                holidays = Holidays.objects.all()
+                holidays_array = []
+                for holiday in holidays:
+                    holidays_array.append(holiday.date)
+                    print(holidays_array)
 
-        except Holidays.DoesNotExist:
-            holidays_array = []
+            except Holidays.DoesNotExist:
+                holidays_array = []
 
-        for leave in leaves:
-            leave.duration = np.busday_count(leave.startdate, leave.enddate, weekmask='1111100', holidays=holidays_array) + 1
-        return leaves
+            for leave in leaves:
+                leave.duration = np.busday_count(leave.startdate, leave.enddate, weekmask='1111100', holidays=holidays_array) + 1
+
+            return leaves
+
+        except (Employees.DoesNotExist, LeaveRequest.DoesNotExist):
+            return None
+
+        except e:
+            return None
 
     def update_leave_status(self, leave_id, action):
         try:
@@ -127,11 +135,15 @@ class LeaveRequestService:
 class HolidayService:
 
     def new_holiday(self, hname, hdate):
-        holidays, created = Holidays.objects.get_or_create(date=hdate)
-        holidays.holiday_name = hname
-        holidays.date = hdate
-        input_date = tuple(map(int, hdate.split('-')))
-        day_name = calendar.weekday(*input_date)
-        holidays.day = calendar.day_name[day_name]
-        holidays.save()
-        return 'holidays'
+        try:
+            holidays, created = Holidays.objects.get_or_create(date=hdate)
+            holidays.holiday_name = hname
+            holidays.date = hdate
+            input_date = tuple(map(int, hdate.split('-')))
+            day_name = calendar.weekday(*input_date)
+            holidays.day = calendar.day_name[day_name]
+            holidays.save()
+            return 'holidays', 'Successfully added new holiday'
+
+        except e:
+            return 'holidays', 'Could not add new holiday'

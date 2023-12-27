@@ -96,7 +96,11 @@ class Holiday(View):
     template_name = 'holidays.html'
 
     def get(self, request):
-        holidays = Holidays.objects.all()
+        try:
+            holidays = Holidays.objects.all()
+        except Holidays.DoesNotExist:
+            holidays = None
+
         context = {
             'holidays': holidays
         }
@@ -107,5 +111,5 @@ class Holiday(View):
         hname = request.POST['name']
         hdate = request.POST['date']
         holiday_service = HolidayService()
-        redirect_url = holiday_service.new_holiday(hname, hdate)
+        redirect_url, message = holiday_service.new_holiday(hname, hdate)
         return redirect(redirect_url)
