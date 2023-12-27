@@ -38,4 +38,32 @@ $(document).ready(function() {
         return date.toISOString().split('T')[0];
     }
 
+        $('.btn-dark').on('click', function () {
+            var row = $(this).closest('tr');
+            var columns = row.find('td');
+
+            var emppid = $(columns[1]).text().trim();
+            var empName = $(columns[2]).text().trim();
+
+            $('#emp-name').val(empName);
+            $('#emp-id').val(emppid);
+
+            $('#Lop').modal('show');
+
+});
+        function updateEndDateMin() {
+            var startDate = document.getElementById('start_date').value;
+            var endDateInput = document.getElementById('end_date');
+
+            // Set the min attribute of the end date input
+            endDateInput.min = startDate;
+
+            // Ensure that the end date is always greater than or equal to the start date
+            if (endDateInput.value < startDate) {
+                endDateInput.value = startDate;
+            }
+            }
+
+
+$('#start_date').on('change', updateEndDateMin);
 });

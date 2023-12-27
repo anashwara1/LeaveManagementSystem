@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
 from Users.models import *
-
+from leaves.models import *
 
 class UserService:
     def user_authentication(self, user):
@@ -146,7 +146,11 @@ class UserService:
         return context
 
     def update_user(self, empid, fname, lname, email, dep, desig, doj, manager):
-        user = Employees.objects.get(emp_id=empid)
+        try:
+            user = Employees.objects.get(emp_id=empid)
+        except Employees.DoesNotExist:
+            return 'employees', 'Employee not found'
+
         user.first_name = fname
         user.last_name = lname
         user.email = email
@@ -161,10 +165,29 @@ class UserService:
             user.is_staff = False
 
         user.save()
-        return 'employees'
+        return 'employees', 'Employee details updated successfully'
 
     def delete_employee(self, employee_id):
         employee = get_object_or_404(Employees, emp_id=employee_id)
         employee.is_active = False
         employee.save()
         return 'employees'
+
+    def lossofpay(self, startdate, enddate, lopdays, empid, remarks):
+        try:
+            user = Employees.objects.get(emp_id=empid)
+        except Employees.DoesNotExist:
+            return 'employees', 'Employee not found'
+
+        employee_lop, created = LossOfPay.objects.get_or_create(empid=user)
+        employee_lop.start_date = startdate
+        employee_lop.end_date = enddate
+        employee_lop.remarks = remarks
+
+        if employee_lop.lop is None:
+            employee_lop.lop = 0
+        employee_lop.lop += float(lopdays)
+        employee_lop.save()
+
+        return 'employees', 'LOP is added'
+
