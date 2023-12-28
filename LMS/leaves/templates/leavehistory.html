@@ -36,8 +36,10 @@
             <td>{{ leave_request.enddate }}</td>
             <td>{{ leave_request.status }}</td>
             <td>
+              {% if leave_request.status != "Accepted" and leave_request.status != "Rejected" %}
               <button type="button" class="btn btn-primary btn-sm" onclick="editLeave(this)" data-reason="{{ leave_request.reason }}" data-leaveid="{{ leave_request.leave_request_id }}" >Edit</button>
               <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ leave_request.leave_request_id }})">Delete</button>
+              {% endif %}
             </td>
           </tr>
 

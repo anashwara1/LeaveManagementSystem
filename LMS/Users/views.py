@@ -1,12 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect
+from django.utils.datetime_safe import datetime
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 
 from Users.models import Employees
+from leaves.models import Leavebalance, LeaveRequest, LossOfPay
 from Users.services.service import UserService
 
 # Create your views here.
@@ -152,6 +155,86 @@ class Dashboard(View):
 
     def get(self, request):
         return render(request, self.template_name)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            all_employees = Employees.objects.all()
+            yearly_data = self.get_yearly_leave_data(all_employees)
+
+            context = {
+                'yearly_data': yearly_data,
+            }
+            return render(request, self.template_name, context)
+        except Exception as e:
+
+            return HttpResponseServerError("An error occurred while processing the data.")
+
+    def get_yearly_leave_data(self, employees):
+        yearly_data = []
+
+        for employee in employees:
+            current_date = datetime.now()
+            try:
+                leave_balance = Leavebalance.objects.get(empid=employee.emp_id)
+            except Leavebalance.DoesNotExist:
+                current_date = datetime.now()
+                total_months = ( current_date.year - employee.date_of_joining.year) * 12 + current_date.month - employee.date_of_joining.month + 1
+                leave_earned = max(2.0 * total_months, 0)
+                current_date = datetime.now()
+
+                leave_balance = Leavebalance(
+                    empid=employee,
+                    leave_earned=leave_earned,
+                    leave_consumed=0,
+                    comp_off=0
+                )
+                leave_balance.save()
+
+            # Fetch LOP data for the employee
+            lop_data = LossOfPay.objects.filter(empid=employee.emp_id, start_date__year=current_date.year)
+            total_lop = sum(lop.lop for lop in lop_data)
+
+            leave_earned = leave_balance.leave_earned or 0
+            leave_consumed = leave_balance.leave_consumed or 0
+            comp_off = leave_balance.comp_off or 0
+
+            employee_data = {
+                'Ecode': employee.emp_id,
+                'Name_of_Employee': employee.get_full_name(),
+                'DOJ': employee.date_of_joining,
+                'L_Ernd': leave_earned,
+                'L_Cnsmd': leave_consumed,  # Consumed leave excluding LOP
+                'LOP': total_lop,  # Total LOP
+                'Comp_off': comp_off,
+            }
+
+            # Calculate L_Bal based on the provided formula
+            employee_data['L_Bal'] = (
+                    leave_earned - leave_consumed + total_lop + comp_off
+            )
+
+            # Get all leave requests for the employee
+            leave_requests = LeaveRequest.objects.filter(emp=employee)
+
+            # Initialize LE to 2 for each month after the date of joining
+            for month in range(employee.date_of_joining.month, 13):
+                start_month = datetime.strptime(str(month), "%m").strftime("%b").upper()
+                employee_data.setdefault(f'LE_{start_month}', 2.0)
+
+            # Dynamically fetch LC for each month based on accepted leave requests
+            for leave_request in leave_requests.filter(status='accepted'):
+                start_month = leave_request.startdate.strftime("%b").upper()
+
+                # Calculate LC based on accepted leave request duration
+                leave_duration = (leave_request.enddate - leave_request.startdate).days + 1
+
+                # Ensure LC field is initialized for each month
+                employee_data.setdefault(f'LC_{start_month}', 0.0)
+                employee_data[f'LC_{start_month}'] += leave_duration  # Assuming 1 day for leave consumed
+
+            yearly_data.append(employee_data)
+
+        return yearly_data
 
 
 @method_decorator(login_required(login_url='/login'), name='dispatch')

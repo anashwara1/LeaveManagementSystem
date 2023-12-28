@@ -1,6 +1,7 @@
 
-
 {% extends 'admin_base.html' %}
+{% load static %}
+
 
 {% block title %}Dashboard{% endblock %}
 
@@ -28,26 +29,95 @@
       </div>
     </div>
 
-<!--    &lt;!&ndash; Card 3: Custom Card 1 &ndash;&gt;-->
-<!--    <div class="col-md-6 col-lg-3">-->
-<!--      <div class="card custom-card custom-1 shadow-lg mb-4">-->
-<!--        <div class="card-body">-->
-<!--          <h5 class="card-title">Custom Card 1</h5>-->
-<!--          <p class="card-text">Description of the custom card.</p>-->
-<!--          <a href="#" class="btn btn-info">Custom Action</a>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
 
-<!--    &lt;!&ndash; Card 4: Custom Card 2 &ndash;&gt;-->
-<!--    <div class="col-md-6 col-lg-3">-->
-<!--      <div class="card custom-card custom-2 shadow-lg mb-4">-->
-<!--        <div class="card-body">-->
-<!--          <h5 class="card-title">Custom Card 2</h5>-->
-<!--          <p class="card-text">Description of the custom card.</p>-->
-<!--          <a href="#" class="btn btn-warning">Custom Action</a>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+    <div class="card" >
+    <h2>Leave Report </h2>
+    <br>
+ <div class="table-responsive">
+  <table class="table table-striped"  id="details" >
+       <thead >
+             <tr>
+                <th>Ecode</th>
+                <th>Name of Employee</th>
+                <th>DOJ</th>
+                <th>L Bal</th>
+                <th>L Ernd</th>
+                <th>L Cnsmd</th>
+                <th>Comp_off</th>
+                <th>LOP</th>
+                <!-- Add columns for each month -->
+                <th>LE.JAN</th>
+                <th>LC.JAN</th>
+                <th>LE.FEB</th>
+                <th>LC.FEB</th>
+                <th>LE.MAR</th>
+                <th>LC.MAR</th>
+                <th>LE.APR</th>
+                <th>LC.APR</th>
+                <th>LE.MAY</th>
+                <th>LC.MAY</th>
+                <th>LE.JUN</th>
+                <th>LC.JUN</th>
+                <th>LE.JUL</th>
+                <th>LC.JUL</th>
+                <th>LE.AUG</th>
+                <th>LC.AUG</th>
+                <th>LE.SEP</th>
+                <th>LC.SEP</th>
+                <th>LE.OCT</th>
+                <th>LC.OCT</th>
+                <th>LE.NOV</th>
+                <th>LC.NOV</th>
+                <th>LE.DEC</th>
+                <th>LC.DEC</th>
+            </tr>
+    </thead>
+    <tbody>
+        {% for employee_data in yearly_data %}
+                <tr>
+                    <td>{{ employee_data.Ecode }}</td>
+                    <td>{{ employee_data.Name_of_Employee }}</td>
+                    <td>{{ employee_data.DOJ }}</td>
+                    <td>{{ employee_data.L_Bal }}</td>
+                    <td>{{ employee_data.L_Ernd }}</td>
+                    <td>{{ employee_data.L_Cnsmd }}</td>
+                    <td>{{ employee_data.Comp_off }}</td>
+                    <td>{{ employee_data.LOP }}</td>
+                    <!-- Add cells for each month -->
+                    <td>{{ employee_data.LE_JAN }}</td>
+                    <td>{{ employee_data.LC_JAN }}</td>
+                    <td>{{ employee_data.LE_FEB }}</td>
+                    <td>{{ employee_data.LC_FEB }}</td>
+                    <td>{{ employee_data.LE_MAR }}</td>
+                    <td>{{ employee_data.LC_MAR }}</td>
+                    <td>{{ employee_data.LE_APR }}</td>
+                    <td>{{ employee_data.LC_APR }}</td>
+                    <td>{{ employee_data.LE_MAY }}</td>
+                    <td>{{ employee_data.LC_MAY }}</td>
+                    <td>{{ employee_data.LE_JUN }}</td>
+                    <td>{{ employee_data.LC_JUN }}</td>
+                    <td>{{ employee_data.LE_JUL }}</td>
+                    <td>{{ employee_data.LC_JUL }}</td>
+                    <td>{{ employee_data.LE_AUG }}</td>
+                    <td>{{ employee_data.LC_AUG }}</td>
+                    <td>{{ employee_data.LE_SEP }}</td>
+                    <td>{{ employee_data.LC_SEP }}</td>
+                    <td>{{ employee_data.LE_OCT }}</td>
+                    <td>{{ employee_data.LC_OCT }}</td>
+                    <td>{{ employee_data.LE_NOV }}</td>
+                    <td>{{ employee_data.LC_NOV }}</td>
+                    <td>{{ employee_data.LE_DEC }}</td>
+                    <td>{{ employee_data.LC_DEC }}</td>
+                </tr>
+            {% endfor %}
+    </tbody>
+  </table>
+        </div>
+    </div>
+
+
+</div>
+
+ <script type="text/javascript" src="{% static 'js/admindashboard.js' %}"></script>
+
 {% endblock %}

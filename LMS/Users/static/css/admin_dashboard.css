@@ -110,5 +110,14 @@ body {
       color: #fff;
     }
 
+#details th, #details td {
+    max-width: 100px; /* Set a maximum width for each cell */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+
 
 
