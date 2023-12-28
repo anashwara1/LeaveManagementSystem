@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
-
+from django.views.generic import TemplateView
+from leaves.models import *
 from Users.models import Employees
-from leaves.services.service import LeaveService, ApplyLeaveService, LeaveHistoryService, LeaveRequestService
+from leaves.services.service import *
 
 
 class EditLeaveView(View):
@@ -69,7 +70,7 @@ class LeaveHistory(View):
 class LeaveRequestView(View):
     template_name = 'leaveRequest.html'
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         try:
             leave_request_service = LeaveRequestService()
             leaves = leave_request_service.get_leave_requests()
@@ -84,12 +85,10 @@ class LeaveRequestView(View):
 
     def post(self, request):
         try:
-            leave_request_service = LeaveRequestService()
-
             action = request.POST.get('action')
             leave_id = request.POST.get('empid')
             comment = request.POST.get('comment')
-
+            leave_request_service = LeaveRequestService()
             leave_request_service.update_leave_status(leave_id, action, comment)
 
             return redirect('leaveRequest')
@@ -97,3 +96,38 @@ class LeaveRequestView(View):
         except Exception as e:
             messages.error(request, e)
             return redirect('errorpage')
+
+
+class Holiday(View):
+    template_name = 'holidays.html'
+
+    def get(self, request):
+        try:
+            holidays = Holidays.objects.all()
+        except Holidays.DoesNotExist:
+            holidays = None
+
+        context = {
+            'holidays': holidays
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        try:
+            hname = request.POST['name']
+            hdate = request.POST['date']
+
+            holiday_service = HolidayService()
+            redirect_url, message = holiday_service.new_holiday(hname, hdate)
+            messages.success(request, message)
+            return redirect(redirect_url)
+
+        except Exception as e:
+            print("Exception:", e)
+            messages.error(request, e)
+            return redirect('errorpage')
+
+
+class ErrorPageView(TemplateView):
+    template_name = 'errorpage.html'

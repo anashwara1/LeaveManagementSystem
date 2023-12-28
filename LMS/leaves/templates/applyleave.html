@@ -16,8 +16,10 @@
         </div>
     {% endfor %}
 {% endif %}
+<div class="container">
 <div class="card">
-
+<h2>Apply Leave</h2>
+    <br>
   <div class="card-body1">
 
     <form action="{% url 'applyleave' %}" method="POST">
@@ -78,6 +80,7 @@
     </form>
 
   </div>
+</div>
 </div>
 {% endblock %}
 
