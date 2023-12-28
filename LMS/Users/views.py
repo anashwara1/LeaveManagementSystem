@@ -264,16 +264,28 @@ class EmployeePageView(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        empid = request.POST['empid']
-        fname = request.POST['fname']
-        lname = request.POST['lname']
-        email = request.POST['email']
-        dep = request.POST['dept']
-        desig = request.POST['desig']
-        doj = request.POST['doj']
-        manager = request.POST['ismanager']
-        redirect_url = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
-        messages.success(request, 'Employee details updated successfully')
+
+        form_type = request.POST['form_type']
+        if form_type == 'form1':
+            empid = request.POST['empid']
+            fname = request.POST['fname']
+            lname = request.POST['lname']
+            email = request.POST['email']
+            dep = request.POST['dept']
+            desig = request.POST['desig']
+            doj = request.POST['doj']
+            manager = request.POST['ismanager']
+            redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+
+        else:
+            employee_id = request.POST['emp-id']
+            startdate = request.POST['startdate']
+            enddate = request.POST['enddate']
+            lopdays = request.POST['noofdays']
+            remarks = request.POST['remarks']
+            redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
+
+        messages.success(request, message)
 
         return redirect(redirect_url)
 

@@ -4,7 +4,8 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 import numpy as np
 from Users.models import Employees
-from leaves.models import LeaveTypes, LeaveRequest
+from leaves.models import *
+import calendar
 
 
 class ApplyLeaveService:
@@ -16,7 +17,7 @@ class ApplyLeaveService:
     def apply_leave_service(self, startdate, enddate, reason, leavetype, emp):
         leaveTypeid_object, created = LeaveTypes.objects.get_or_create(leave_type_name=leavetype)
         try:
-            leave_requests = LeaveRequest.objects.filter(startdate__range=(startdate, enddate), enddate__range=(startdate,enddate))
+            leave_requests = LeaveRequest.objects.filter(startdate__range=(startdate, enddate), enddate__range=(startdate, enddate), emp=emp.emp_id)
             if leave_requests.exists():
                 return True
             else:
@@ -25,9 +26,13 @@ class ApplyLeaveService:
                     enddate=enddate,
                     reason=reason,
                     leavetypeid=leaveTypeid_object,
-                    status='Pending',
                     emp=emp
                 )
+
+                if emp.is_superuser:
+                    new_leave.status = 'Accepted'
+                else:
+                    new_leave.status = 'Pending'
                 new_leave.save()
                 return False
 
@@ -64,29 +69,86 @@ class LeaveService:
 
 class LeaveRequestService:
     def get_leave_requests(self):
-        emp_under_manager = Employees.objects.filter(is_staff=False)
-        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
-        for leave in leaves:
-            leave.duration = np.busday_count(leave.enddate, leave.startdate) + 1
-        return leaves
+        try:
+            emp_under_manager = Employees.objects.filter(is_staff=False)
+            leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+
+            holidays = Holidays.objects.all()
+            holidays_array = []
+            for holiday in holidays:
+                holidays_array.append(holiday.date)
+                print(holidays_array)
+            for leave in leaves:
+                leave.duration = np.busday_count(leave.startdate, leave.enddate, weekmask='1111100',
+                                                 holidays=holidays_array) + 1
+            return leaves
+
+        except Holidays.DoesNotExist as e:
+            raise e
+
+        except (Employees.DoesNotExist, LeaveRequest.DoesNotExist) as e:
+            raise e
+
+        except Exception as e:
+            raise e
 
     def update_leave_status(self, leave_id, action):
-        updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-        duration = np.busday_count(updated_leave.enddate, updated_leave.startdate) + 1
-        if action == 'accept':
-            updated_leave.status = 'Accepted'
-            # updated_leave.emp.balance -= duration
-            updated_leave.emp.save()
+        try:
+            updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
+            holidays = Holidays.objects.all()
+            holidays_array = []
+            for holiday in holidays:
+                holidays_array.append(holiday.date)
 
-        else:
-            updated_leave.status = 'Rejected'
+            duration = np.busday_count(updated_leave.startdate, updated_leave.enddate, weekmask='1111100',
+                                       holidays=holidays_array) + 1
+            leave_consumed, created = Leavebalance.objects.get_or_create(empid=updated_leave.emp)
+            if leave_consumed.leave_consumed is None:
+                leave_consumed.leave_consumed = 0
+            if action == 'accept':
+                updated_leave.status = 'Approved'
+                leave_consumed.leave_consumed += duration
+                leave_consumed.save()
 
-        updated_leave.save()
+            else:
+                updated_leave.status = 'Rejected'
 
-        email = Employees.objects.get(email=updated_leave.emp.email)
-        subject = f'LEAVE REQUEST {action.upper()}ED'
-        message = f'The leave request you have sent has been {action}ed'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email.email]
+            updated_leave.save()
 
-        send_mail(subject, message, from_email, recipient_list)
+            email = Employees.objects.get(email=updated_leave.emp.email)
+            subject = f'LEAVE REQUEST {action.upper()}ED'
+            message = f'The leave request you have sent has been {action}ed'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email.email]
+
+            send_mail(subject, message, from_email, recipient_list)
+
+        except LeaveRequest.DoesNotExist as e:
+            raise e
+
+        except Holidays.DoesNotExist as e:
+            raise e
+
+        except Leavebalance.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e
+
+
+class HolidayService:
+
+    def new_holiday(self, hname, hdate):
+        try:
+            holidays, created = Holidays.objects.get_or_create(date=hdate)
+            holidays.holiday_name = hname
+            holidays.date = hdate
+            input_date = tuple(map(int, hdate.split('-')))
+            day_name = calendar.weekday(*input_date)
+            holidays.day = calendar.day_name[day_name]
+            holidays.save()
+            return 'holidays', 'Successfully added new holiday'
+
+        except Exception as e:
+            raise e
+

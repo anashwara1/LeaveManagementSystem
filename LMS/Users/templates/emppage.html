@@ -30,6 +30,7 @@
           <th>DOJ</th>
           <th>Leave Balance</th>
             <th>Action</th>
+            <th>LOP</th>
         </tr>
       </thead>
        <tbody>
@@ -47,6 +48,9 @@
                     <button type="submit" class="btn btn-danger">Delete</button>
                   </form>
               </td>
+              <td>
+                   <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#Lop">LOP</button>
+                  </td>
           </tr>
 
         {% endfor %}
@@ -163,7 +167,7 @@
 <!--            </div>-->
 
 <!--    <br>-->
-                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="submit" name="form_type" value="form1" class="btn btn-success">Submit</button>
         </form>
 </div>
             </div></div>
@@ -175,6 +179,67 @@
 
 </div>
 
+<div class="modal fade" id="Lop" tabindex="-1" aria-labelledby="LopLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="container-fluid h-100">
+<div class="card-body">
+<div class="container">
+    <div class="form-group row">
+                <label for="emp-name" class="col-md-3 col-form-label">Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="emp-name" disabled>
+                </div>
+            </div>
+            <br>
+
+                <div class="card">
+ <div class="card-header text-center">
+    LOP
+  </div>
+<br>
+    <form action="{% url 'employees' %}" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="form-group row">
+        <label for="start_date" class="col-md-4 col-form-label bold-label">Start Date:</label>
+        <div class="col-md-8">
+            <input type="hidden" name="emp-id" id="emp-id">
+        <input type="date" class="form-control" id="start_date" placeholder="Start Date" name="startdate" max="{% now 'Y-m-d' %}" required>
+        </div>
+      </div>
+    <br>
+      <div class="form-group row">
+        <label for="end_date" class="col-md-4 col-form-label bold-label">End Date:</label>
+        <div class="col-md-8">
+        <input type="date" class="form-control" id="end_date" placeholder="End Date" name="enddate" max="{% now 'Y-m-d' %}" required>
+        </div>
+      </div>
+        <br>
+<div class="form-group row">
+            <label for="employee-noofdays" class="col-md-4 col-form-label bold-label">No: of Days:</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control" id="employee-noofdays" name="noofdays" required>
+            </div>
+        </div>
+        <br>
+
+    <div class="form-group row">
+            <label for="employee-remarks" class="col-md-4 col-form-label bold-label">Remarks:</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control" id="employee-remarks" name="remarks" required>
+            </div>
+        </div>
+        <br>
+    <button type="submit" name="form_type" value="form2" class="btn btn-success">Submit</button>
+</form>
+</div>
+</div>
+                </div>
+            </div>
+        </div>
+</div>
+
+</div>
 {% endblock %}
 
 

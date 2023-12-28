@@ -1,0 +1,94 @@
+{% load static %}
+{% if user.is_staff %}
+    {% include 'admin_base.html' %}
+{% else %}
+    {% include 'base.html' %}
+{% endif %}
+
+{% block additional_head %}
+
+
+<script type="text/javascript" src="{% static 'js/edituser.js' %}"> </script>
+
+{% endblock %}
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="container">
+   <div class="card position-relative">
+       {% if user.is_staff %}
+       <button class="btn btn-primary position-absolute top-0 end-0 mt-2 mr-2" data-bs-toggle="modal" data-bs-target="#addHoliday">Add Holiday+</button>
+       {% endif %}
+    <h2>Holidays</h2>
+    <br>
+  <table id="details">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Holiday</th>
+          <th>Date</th>
+          <th>Day</th>
+        </tr>
+      </thead>
+       <tbody>
+        {% for holiday in holidays %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ holiday.holiday_name }}</td>
+            <td>{{ holiday.date }}</td>
+            <td>{{ holiday.day }}</td>
+          </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+
+</table>
+   </div>
+    </div>
+
+<div class="modal fade" id="addHoliday" tabindex="-1" aria-labelledby="addHolidayLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="container-fluid h-100">
+                    <div class="container">
+<div class="card-body">
+
+            <div class="card">
+ <div class="card-header text-center">
+    Add Holiday
+  </div>
+<br>
+
+<form action="{% url 'holidays' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+            <div class="form-group row">
+                <label for="holiday-name" class="col-md-3 col-form-label bold-label">Holiday Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" id="holiday-name" name="name" required>
+                </div>
+            </div>
+            <br>
+            <div class="form-group row">
+                <label for="holiday-date" class="col-md-3 col-form-label bold-label">Date:</label>
+                <div class="col-md-9">
+                    <input type="date" class="form-control" id="holiday-date" name="date" required>
+                </div>
+            </div>
+            <br>
+                    <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+</div>
+            </div></div>
+</div>
+
+        </div>
+            </div>
+        </div>
+       {% endblock %}

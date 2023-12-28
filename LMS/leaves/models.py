@@ -10,7 +10,6 @@ class Leavebalance(models.Model):
     leave_earned = models.FloatField(db_column='Leave_Earned', blank=True, null=True)
     leave_consumed = models.FloatField(db_column='Leave_Consumed', blank=True, null=True)
     carry_forward = models.FloatField(db_column='Carry_Forward', blank=True, null=True)
-    LOP = models.FloatField(db_column='LOP', blank=True, null=True)
     comp_off = models.FloatField(db_column='Comp_Off', blank=True, null=True)
 
     class Meta:
@@ -40,3 +39,26 @@ class LeaveTypes(models.Model):
         managed = True
         db_table = 'Leave_Types'
 
+
+class Holidays(models.Model):
+    holiday_id = models.AutoField(db_column='Holiday_ID', primary_key=True)
+    holiday_name = models.CharField(db_column='Holiday', max_length=100, blank=True, null=True)
+    date = models.DateField(db_column='Date', blank=True, null=True)
+    day = models.CharField(db_column='Day', max_length=10, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'Holidays'
+
+
+class LossOfPay(models.Model):
+    lop_id = models.AutoField(db_column='Lop_ID', primary_key=True)
+    empid = models.ForeignKey(Employees, models.DO_NOTHING, db_column='Emp_ID', blank=True, null=True)
+    lop = models.FloatField(db_column='LOP', blank=True, null=True)
+    start_date = models.DateField(db_column='Start_Date', blank=True, null=True)  # Field name made lowercase.
+    end_date = models.DateField(db_column='End_Date', blank=True, null=True)
+    remarks = models.CharField(db_column='Remarks', max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'LOP'
