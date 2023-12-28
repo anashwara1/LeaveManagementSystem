@@ -35,7 +35,6 @@ class LoginView(View):
             return redirect(redirect_url)
 
         else:
-            print("Invalid login attempt.")
             messages.error(request, "Invalid Credentials. Please check your username and password.")
             return render(request, self.template_name)
 
@@ -131,7 +130,6 @@ class RegisterView(View):
 
         employee_image = request.FILES.get('employee_image', None)
         existing_employees = Employees.objects.filter(email=email)
-        print(existing_employees.exists())
 
         if len(empid) >= 10:
             messages.error(request, 'Entered employee ID is too long')
@@ -261,30 +259,35 @@ class EmployeePageView(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
+        try:
+            form_type = request.POST['form_type']
+            if form_type == 'form1':
+                empid = request.POST['empid']
+                fname = request.POST['fname']
+                lname = request.POST['lname']
+                email = request.POST['email']
+                dep = request.POST['dept']
+                desig = request.POST['desig']
+                doj = request.POST['doj']
+                manager = request.POST['ismanager']
 
-        form_type = request.POST['form_type']
-        if form_type == 'form1':
-            empid = request.POST['empid']
-            fname = request.POST['fname']
-            lname = request.POST['lname']
-            email = request.POST['email']
-            dep = request.POST['dept']
-            desig = request.POST['desig']
-            doj = request.POST['doj']
-            manager = request.POST['ismanager']
-            redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
+                redirect_url, message = userservice.update_user(empid, fname, lname, email, dep, desig, doj, manager)
 
-        else:
-            employee_id = request.POST['emp-id']
-            startdate = request.POST['startdate']
-            enddate = request.POST['enddate']
-            lopdays = request.POST['noofdays']
-            remarks = request.POST['remarks']
-            redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
+            else:
+                employee_id = request.POST['emp-id']
+                startdate = request.POST['startdate']
+                enddate = request.POST['enddate']
+                lopdays = request.POST['noofdays']
+                remarks = request.POST['remarks']
 
-        messages.success(request, message)
+                redirect_url, message = userservice.lossofpay(startdate, enddate, lopdays, employee_id, remarks)
 
-        return redirect(redirect_url)
+            messages.success(request, message)
+            return redirect(redirect_url)
+
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
 
 class ChangePassword(View):
@@ -316,9 +319,14 @@ class ProfileView(View):
     template_name = 'profile.html'
 
     def get(self, request):
-        email = request.user.email
-        context = userservice.get_employee_profile(email)
-        return render(request, self.template_name, context)
+        try:
+            email = request.user.email
+            context = userservice.get_employee_profile(email)
+            return render(request, self.template_name, context)
+
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
 
 class Logout(View):
