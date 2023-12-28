@@ -68,29 +68,49 @@ class LeaveService:
 
 class LeaveRequestService:
     def get_leave_requests(self):
-        emp_under_manager = Employees.objects.filter(is_staff=False)
-        leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
-        for leave in leaves:
-            leave.duration = np.busday_count(leave.enddate, leave.startdate) + 1
-        return leaves
+        try:
+            emp_under_manager = Employees.objects.filter(is_staff=False)
+            leaves = LeaveRequest.objects.filter(emp__in=emp_under_manager)
+            for leave in leaves:
+                leave.duration = np.busday_count(leave.enddate, leave.startdate) + 1
+            return leaves
 
-    def update_leave_status(self, leave_id, action):
-        updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
-        duration = np.busday_count(updated_leave.enddate, updated_leave.startdate) + 1
-        if action == 'accept':
-            updated_leave.status = 'Accepted'
-            # updated_leave.emp.balance -= duration
-            updated_leave.emp.save()
+        except Employees.DoesNotExist as e:
+            raise e
 
-        else:
-            updated_leave.status = 'Rejected'
+        except LeaveRequest.DoesNotExist as e:
+            raise e
 
-        updated_leave.save()
+        except Exception as e:
+            raise e
 
-        email = Employees.objects.get(email=updated_leave.emp.email)
-        subject = f'LEAVE REQUEST {action.upper()}ED'
-        message = f'The leave request you have sent has been {action}ed'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email.email]
+    def update_leave_status(self, leave_id, action, comment):
+        try:
+            updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
+            duration = np.busday_count(updated_leave.enddate, updated_leave.startdate) + 1
+            if action == 'accept':
+                updated_leave.status = 'Accepted'
+                # updated_leave.emp.balance -= duration
+                updated_leave.emp.save()
 
-        send_mail(subject, message, from_email, recipient_list)
+            else:
+                updated_leave.status = 'Rejected'
+
+            updated_leave.save()
+
+            email = Employees.objects.get(email=updated_leave.emp.email)
+            subject = f'LEAVE REQUEST {action.upper()}ED'
+            message = f'The leave request you have sent has been {action}ed.  {comment}'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email.email]
+
+            send_mail(subject, message, from_email, recipient_list)
+
+        except LeaveRequest.DoesNotExist as e:
+            raise e
+
+        except Employees.DoesNotExist as e:
+            raise e
+
+        except Exception as e:
+            raise e

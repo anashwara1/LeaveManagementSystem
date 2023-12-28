@@ -118,6 +118,13 @@
                 </div>
             </div>
                     <br>
+            <div class="form-group row commentFormGroup">
+                <label for="leave-comment" class="col-md-3 col-form-label">Comment:</label>
+                <div class="col-md-9">
+                    <textarea type="text" class="form-control" id="leave-comment" rows="3" placeholder="(Optional)" name="comment"></textarea>
+                </div>
+            </div>
+                    <br>
                     <button type="submit" class="btn btn-success pending-buttons" name="action" value="accept">Accept</button>
                     <button type="submit" class="btn btn-danger pending-buttons" name="action" value="reject">Reject</button>
         </form>
@@ -127,5 +134,6 @@
         </div>
     </div>
 </div>
-
+    </div>
+</div>
 {% endblock %}

@@ -45,8 +45,10 @@ $(document).ready(function() {
 
             if (status === 'Pending') {
             $('.pending-buttons').show();
+            $('.commentFormGroup').show();
         } else {
             $('.pending-buttons').hide();
+            $('.commentFormGroup').hide();
         }
 
         });

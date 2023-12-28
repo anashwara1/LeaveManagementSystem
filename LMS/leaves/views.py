@@ -19,6 +19,7 @@ class EditLeaveView(View):
         leave_service.edit_leave(leave_id, leavetype, startdate, enddate, reason)
         return redirect('leavehistory')
 
+
 class DeleteLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
         leave_service = LeaveService()
@@ -45,7 +46,6 @@ class ApplyLeave(View):
         else:
             messages.success(request, 'Leave Request sent successfully.')
             return redirect('leavehistory')
-        return render(request, self.template_name)
 
     def get(self, request):
         applyleaveservice = ApplyLeaveService()
@@ -69,23 +69,31 @@ class LeaveHistory(View):
 class LeaveRequestView(View):
     template_name = 'leaveRequest.html'
 
-    def get(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
-        context = {
-            'leaves': leaves
-        }
-        return render(request, self.template_name, context)
+    def get(self, request):
+        try:
+            leave_request_service = LeaveRequestService()
+            leaves = leave_request_service.get_leave_requests()
+            context = {
+                'leaves': leaves
+            }
+            return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
-        action = request.POST.get('action')
-        leave_id = request.POST.get('empid')
+    def post(self, request):
+        try:
+            leave_request_service = LeaveRequestService()
 
-        leave_request_service.update_leave_status(leave_id, action)
+            action = request.POST.get('action')
+            leave_id = request.POST.get('empid')
+            comment = request.POST.get('comment')
 
-        return redirect('leaveRequest')
+            leave_request_service.update_leave_status(leave_id, action, comment)
+
+            return redirect('leaveRequest')
+
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
