@@ -220,8 +220,8 @@ class UserService:
             raise e
 
     def calculate_balance(self, user):
-        lop = self.calculate_lop(user)
         try:
+            lop = self.calculate_lop(user)
             balance_parameters = Leavebalance.objects.get(empid=user)
             balance = (balance_parameters.leave_earned - balance_parameters.leave_consumed +
                        lop - balance_parameters.comp_off)
