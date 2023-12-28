@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from Users.models import Employees
-from leaves.models import Leavebalance, LeaveRequest
+from leaves.models import Leavebalance, LeaveRequest, LossOfPay
 from Users.services.service import UserService
 
 # Create your views here.
@@ -166,38 +166,36 @@ class Dashboard(View):
             }
             return render(request, self.template_name, context)
         except Exception as e:
-            # Log the exception or handle it according to your application's needs
-            # Here, we're returning a simple HTTP 500 response
+
             return HttpResponseServerError("An error occurred while processing the data.")
 
-    def get_yearly_leave_data(self, Employees):
+    def get_yearly_leave_data(self, employees):
         yearly_data = []
 
-        for employee in Employees:
+        for employee in employees:
+            current_date = datetime.now()
             try:
                 leave_balance = Leavebalance.objects.get(empid=employee.emp_id)
             except Leavebalance.DoesNotExist:
-                # Handle the case where a matching record is not found
-                # You can log a message, raise an exception, or take other appropriate actions.
                 current_date = datetime.now()
-                total_months = (current_date.year - employee.date_of_joining.year) * 12 + current_date.month - employee.date_of_joining.month + 1
-                leave_earned = max(2 * total_months, 0)
+                total_months = ( current_date.year - employee.date_of_joining.year) * 12 + current_date.month - employee.date_of_joining.month + 1
+                leave_earned = max(2.0 * total_months, 0)
+                current_date = datetime.now()
 
                 leave_balance = Leavebalance(
                     empid=employee,
                     leave_earned=leave_earned,
                     leave_consumed=0,
-                    LOP=0,
                     comp_off=0
                 )
                 leave_balance.save()
-                # For now, we will skip this employee and continue with the next one.
-                continue
 
-            # Get leave balance values with default of 0
+            # Fetch LOP data for the employee
+            lop_data = LossOfPay.objects.filter(empid=employee.emp_id, start_date__year=current_date.year)
+            total_lop = sum(lop.lop for lop in lop_data)
+
             leave_earned = leave_balance.leave_earned or 0
             leave_consumed = leave_balance.leave_consumed or 0
-            LOP = leave_balance.LOP or 0
             comp_off = leave_balance.comp_off or 0
 
             employee_data = {
@@ -205,14 +203,14 @@ class Dashboard(View):
                 'Name_of_Employee': employee.get_full_name(),
                 'DOJ': employee.date_of_joining,
                 'L_Ernd': leave_earned,
-                'L_Cnsmd': leave_consumed,
-                'LOP': LOP,
+                'L_Cnsmd': leave_consumed,  # Consumed leave excluding LOP
+                'LOP': total_lop,  # Total LOP
                 'Comp_off': comp_off,
             }
 
             # Calculate L_Bal based on the provided formula
             employee_data['L_Bal'] = (
-                    leave_earned - leave_consumed + LOP - comp_off
+                    leave_earned - leave_consumed + total_lop + comp_off
             )
 
             # Get all leave requests for the employee
@@ -235,7 +233,6 @@ class Dashboard(View):
                 employee_data[f'LC_{start_month}'] += leave_duration  # Assuming 1 day for leave consumed
 
             yearly_data.append(employee_data)
-            # print(yearly_data)
 
         return yearly_data
 
