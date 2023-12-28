@@ -1,9 +1,12 @@
-
 {% extends 'admin_base.html' %}
 {% load static %}
-
-
 {% block title %}Dashboard{% endblock %}
+{% block additional_head %}
+<script type="text/javascript" src="{% static 'js/toastr.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/toastr.min.css' %}">
+<script type="text/javascript" src="{% static 'js/admindashboard.js' %}"></script>
+
+{% endblock %}
 
 {% block content %}
   <div class="row">
@@ -28,6 +31,10 @@
         </div>
       </div>
     </div>
+    <div id="notification-container">
+    </div>
+      <input type="hidden" id="aaa" value="{{ has_unread_leave_requests }}">
+  </div>
 
 
     <div class="card" >
@@ -116,8 +123,5 @@
     </div>
 
 
-</div>
-
- <script type="text/javascript" src="{% static 'js/admindashboard.js' %}"></script>
 
 {% endblock %}

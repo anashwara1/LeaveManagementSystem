@@ -7,7 +7,7 @@ from django.utils.datetime_safe import datetime
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
-
+from leaves.models import *
 from Users.models import Employees
 from leaves.models import Leavebalance, LeaveRequest, LossOfPay
 from Users.services.service import UserService
@@ -151,21 +151,22 @@ class RegisterView(View):
 class Dashboard(View):
     template_name = 'admindashboard.html'
 
-    def get(self, request):
-        return render(request, self.template_name)
-
     def get(self, request, *args, **kwargs):
         try:
+            has_unread_leave_requests = LeaveRequest.objects.filter(status='Pending').exists()
             all_employees = Employees.objects.all()
             yearly_data = self.get_yearly_leave_data(all_employees)
 
             context = {
                 'yearly_data': yearly_data,
+                'has_unread_leave_requests': has_unread_leave_requests,
+
             }
             return render(request, self.template_name, context)
-        except Exception as e:
 
-            return HttpResponseServerError("An error occurred while processing the data.")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
     def get_yearly_leave_data(self, employees):
         yearly_data = []
