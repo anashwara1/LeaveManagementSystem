@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect
 from django.utils.datetime_safe import datetime
 from django.utils.decorators import method_decorator
@@ -156,13 +157,18 @@ class Dashboard(View):
         return render(request, self.template_name)
 
     def get(self, request, *args, **kwargs):
-        all_employees = Employees.objects.all()
-        yearly_data = self.get_yearly_leave_data(all_employees)
+        try:
+            all_employees = Employees.objects.all()
+            yearly_data = self.get_yearly_leave_data(all_employees)
 
-        context = {
-            'yearly_data': yearly_data,
-        }
-        return render(request, self.template_name, context)
+            context = {
+                'yearly_data': yearly_data,
+            }
+            return render(request, self.template_name, context)
+        except Exception as e:
+            # Log the exception or handle it according to your application's needs
+            # Here, we're returning a simple HTTP 500 response
+            return HttpResponseServerError("An error occurred while processing the data.")
 
     def get_yearly_leave_data(self, Employees):
         yearly_data = []
@@ -173,6 +179,18 @@ class Dashboard(View):
             except Leavebalance.DoesNotExist:
                 # Handle the case where a matching record is not found
                 # You can log a message, raise an exception, or take other appropriate actions.
+                current_date = datetime.now()
+                total_months = (current_date.year - employee.date_of_joining.year) * 12 + current_date.month - employee.date_of_joining.month + 1
+                leave_earned = max(2 * total_months, 0)
+
+                leave_balance = Leavebalance(
+                    empid=employee,
+                    leave_earned=leave_earned,
+                    leave_consumed=0,
+                    LOP=0,
+                    comp_off=0
+                )
+                leave_balance.save()
                 # For now, we will skip this employee and continue with the next one.
                 continue
 
