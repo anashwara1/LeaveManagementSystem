@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
-
+from django.views.generic import TemplateView
+from leaves.models import *
 from Users.models import Employees
-from leaves.services.service import LeaveService, ApplyLeaveService, LeaveHistoryService, LeaveRequestService
+from leaves.services.service import *
 
 
 class EditLeaveView(View):
@@ -18,6 +19,7 @@ class EditLeaveView(View):
         leave_service = LeaveService()
         leave_service.edit_leave(leave_id, leavetype, startdate, enddate, reason)
         return redirect('leavehistory')
+
 
 class DeleteLeaveView(View):
     def post(self, request, leave_id, *args, **kwargs):
@@ -45,7 +47,6 @@ class ApplyLeave(View):
         else:
             messages.success(request, 'Leave Request sent successfully.')
             return redirect('leavehistory')
-        return render(request, self.template_name)
 
     def get(self, request):
         applyleaveservice = ApplyLeaveService()
@@ -70,22 +71,60 @@ class LeaveRequestView(View):
     template_name = 'leaveRequest.html'
 
     def get(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
-        context = {
-            'leaves': leaves
-        }
-        return render(request, self.template_name, context)
+        try:
+            leave_request_service = LeaveRequestService()
+            leaves = leave_request_service.get_leave_requests()
+            context = {
+                'leaves': leaves
+            }
+            return render(request, self.template_name, context)
+
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
     def post(self, request, *args, **kwargs):
-        user = Employees.objects.get(email=request.user.email)
-        leave_request_service = LeaveRequestService()
-        leaves = leave_request_service.get_leave_requests()
 
         action = request.POST.get('action')
         leave_id = request.POST.get('empid')
+        try:
+            message = leave_request_service.update_leave_status(leave_id, action)
+            return redirect('leaveRequest')
 
-        leave_request_service.update_leave_status(leave_id, action)
+        except Exception as e:
+            messages.error(request, e)
+            return redirect('errorpage')
 
-        return redirect('leaveRequest')
+
+class Holiday(View):
+    template_name = 'holidays.html'
+
+    def get(self, request):
+        try:
+            holidays = Holidays.objects.all()
+        except Holidays.DoesNotExist:
+            holidays = None
+
+        context = {
+            'holidays': holidays
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        hname = request.POST['name']
+        hdate = request.POST['date']
+        try:
+            holiday_service = HolidayService()
+            redirect_url, message = holiday_service.new_holiday(hname, hdate)
+            messages.success(request, message)
+            return redirect(redirect_url)
+
+        except Exception as e:
+            print("Exception:", e)
+            messages.error(request, e)
+            return redirect('errorpage')
+
+
+class ErrorPageView(TemplateView):
+    template_name = 'errorpage.html'
