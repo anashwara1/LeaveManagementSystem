@@ -92,7 +92,7 @@ class LeaveRequestService:
         except Exception as e:
             raise e
 
-    def update_leave_status(self, leave_id, action):
+    def update_leave_status(self, leave_id, action, comment):
         try:
             updated_leave = LeaveRequest.objects.get(leave_request_id=leave_id)
             holidays = Holidays.objects.all()
@@ -117,7 +117,7 @@ class LeaveRequestService:
 
             email = Employees.objects.get(email=updated_leave.emp.email)
             subject = f'LEAVE REQUEST {action.upper()}ED'
-            message = f'The leave request you have sent has been {action}ed'
+            message = f'The leave request you have sent has been {action}ed.  {comment}'
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [email.email]
 

@@ -83,12 +83,14 @@ class LeaveRequestView(View):
             messages.error(request, e)
             return redirect('errorpage')
 
-    def post(self, request, *args, **kwargs):
-
-        action = request.POST.get('action')
-        leave_id = request.POST.get('empid')
+    def post(self, request):
         try:
-            message = leave_request_service.update_leave_status(leave_id, action)
+            action = request.POST.get('action')
+            leave_id = request.POST.get('empid')
+            comment = request.POST.get('comment')
+            leave_request_service = LeaveRequestService()
+            leave_request_service.update_leave_status(leave_id, action, comment)
+
             return redirect('leaveRequest')
 
         except Exception as e:
@@ -112,9 +114,10 @@ class Holiday(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        hname = request.POST['name']
-        hdate = request.POST['date']
         try:
+            hname = request.POST['name']
+            hdate = request.POST['date']
+
             holiday_service = HolidayService()
             redirect_url, message = holiday_service.new_holiday(hname, hdate)
             messages.success(request, message)
