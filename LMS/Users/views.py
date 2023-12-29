@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -9,7 +11,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from Users.models import Employees
-from leaves.models import Leavebalance, LeaveRequest, LossOfPay
+from leaves.models import Leavebalance, LeaveRequest, LossOfPay, Holidays
 from Users.services.service import UserService
 
 # Create your views here.
@@ -213,6 +215,7 @@ class Dashboard(View):
 
             # Get all leave requests for the employee
             leave_requests = LeaveRequest.objects.filter(emp=employee)
+            holiday_dates = set(Holidays.objects.filter(date__year=current_date.year).values_list('date', flat=True))
 
             # Initialize LE to 2 for each month after the date of joining
             for month in range(employee.date_of_joining.month, 13):
@@ -220,15 +223,21 @@ class Dashboard(View):
                 employee_data.setdefault(f'LE_{start_month}', 2.0)
 
             # Dynamically fetch LC for each month based on accepted leave requests
-            for leave_request in leave_requests.filter(status='accepted'):
+            for leave_request in leave_requests.filter(status='Approved'):
                 start_month = leave_request.startdate.strftime("%b").upper()
 
                 # Calculate LC based on accepted leave request duration
                 leave_duration = (leave_request.enddate - leave_request.startdate).days + 1
 
-                # Ensure LC field is initialized for each month
-                employee_data.setdefault(f'LC_{start_month}', 0.0)
-                employee_data[f'LC_{start_month}'] += leave_duration  # Assuming 1 day for leave consumed
+                # # Ensure LC field is initialized for each month
+                # employee_data.setdefault(f'LC_{start_month}', 0.0)
+                # employee_data[f'LC_{start_month}'] += leave_duration  # Assuming 1 day for leave consumed
+                current_date = leave_request.startdate
+                for _ in range(leave_duration):
+                    if current_date.weekday() < 5 and current_date not in holiday_dates:  # Monday to Friday and not a holiday
+                        employee_data.setdefault(f'LC_{start_month}', 0.0)
+                        employee_data[f'LC_{start_month}'] += 1  # Assuming 1 day for leave consumed
+                    current_date += timedelta(days=1)
 
             yearly_data.append(employee_data)
 
